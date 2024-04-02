@@ -9,11 +9,8 @@ import os
 from datetime import datetime
 import json
 import ndjson
-
-
-# Set the color and size for drawing
-draw_color = 'black'
-draw_size = 4
+from helper_functions import setup_UI
+from global_static_vars import draw_color, draw_size, experiment_dir
 
 # Store the coordinates of the previous point
 prev_x = None
@@ -35,16 +32,15 @@ latency = 0.0
 temp = 0.0
 margin = 0.0
 
-def open_canvas(_category : str, _participant : str, _condition : str, _country : str, _experiment_path : str):
-    global category, participant, condition, country, experiment_path, start, strokes_file_path, root, canvas
+def open_canvas(_category : str, _participant : str, _condition : str, _country : str, ):
+    global category, participant, condition, country, start, strokes_file_path, root, canvas
     category = _category
     participant = _participant
     condition = _condition
     country = _country
-    experiment_path = _experiment_path
-    strokes_file_path = experiment_path + "/raw_" + category + ".ndjson"
+    strokes_file_path = experiment_dir + "/raw_" + category + ".ndjson"
     start = time.time()
-    (root, canvas) = setup_UI()
+    (root, canvas) = setup_UI(True)
 
     # Bind the mouse movement event to the canvas
     canvas.bind('<B1-Motion>', on_mouse_move)
@@ -64,26 +60,6 @@ def tr(a,b):
     else:
         return a
 
-def setup_UI() -> "tuple[object, object]":
-
-    # Initialize Tkinter
-    root = tk.Tk()
-    root.attributes('-fullscreen', True)
-
-    ######### CONFIGURATION OF THE GLOBAL VARIABLES OF THE CANVAS AND SCREENSHOTS ###########
-
-    # Set the dimensions of the drawing window
-    #window_width = 1366
-    #window_height = 768
-
-    # Create the drawing canvas
-    button = tk.Button(text=tr("If you finished, press the button", "Ak ste skončili, kliknite pre pokračovanie"), command=lambda: quit_program(), height=4)
-    button.pack(side="bottom")
-
-    canvas = tk.Canvas(root, bg='white')
-    canvas.pack(anchor='center', expand=True, fill="both")
-
-    return (root, canvas)
 
 ############ FUNCTIONS TO DRAW AND TO SAVE THE FINAL DRAWINGS #############
 # Define the event handler for mouse movements
@@ -110,7 +86,7 @@ def on_mouse_move(event):
     t.append(temp)
 
     if prev_x is not None and prev_y is not None:
-        canvas.create_line(prev_x, prev_y, c_x, c_y, fill=draw_color, width=draw_size, tags=('stroke', stroke_count))
+        canvas.create_line(prev_x, prev_y, c_x, c_y, fill=draw_color, width=draw_size)
         detailed_strokes.append([c_x, c_y, c_t])
     prev_x = c_x
     prev_y = c_y
@@ -119,6 +95,8 @@ def on_mouse_move(event):
 # Define the event handler for releasing the mouse button
 def on_mouse_release(event):
     global prev_x, prev_y, stroke_count, total_drawing_time, x, y, t, strokes
+    #Appending invalid to signal end of stroke
+    detailed_strokes.append([-1, -1, -1])
     prev_x = None
     prev_y = None
 
