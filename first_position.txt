@@ -1,0 +1,2 @@
+['r_shoulder_z', 'r_shoulder_y', 'r_arm_x', 'r_elbow_y', 'r_wrist_z', 'r_wrist_x', 'r_thumb_z', 'r_thumb_x', 'r_indexfinger_x', 'r_middlefingers_x']
+[25.0, 46.0, 32.0, 138.0, 153.0, 166.0, -22.0, 69.0, -179.0, 168.0]

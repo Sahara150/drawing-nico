@@ -9,7 +9,7 @@ import numpy as np
 import subprocess
 from datetime import datetime
 
-code_path = "C:/Experiment/Teachingnicdraw/"   #for Bratislava
+code_path = "C:/Users/haras/Uni_SourceCodes/NICO/drawing-nico/"   #for Bratislava
 
 images_dir = code_path+"Images/"
 experiment_dir = images_dir + "Experiments_raw/"
@@ -32,6 +32,7 @@ else:
 now = datetime.now()
 date_hour = now.strftime("_%d-%m-%Y_%H-%M-%S")
 participant_dir = "nicodraws" + str(date_hour)
+python_path = "C:/ProgramData/miniconda3/python"
 path_folder_participant = images_dir + participant_dir
 os.mkdir(path_folder_participant)
 
@@ -60,7 +61,7 @@ def drawing_activity(i):
     print(f"{category}{category_counter}")
     
     # for Bratislava: ToDo, parameterize again when transferring to class
-    p = subprocess.Popen(["C:/Experiment/Drawing/drawing_venv/Scripts/python", script_path, f"{category}{category_counter}",
+    p = subprocess.Popen([python_path, script_path, f"{category}{category_counter}",
                         path_folder_participant, "no_robot", "sk", experiment_dir], stdout=subprocess.PIPE)
     p.wait()
 

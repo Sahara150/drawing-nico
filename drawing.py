@@ -6,42 +6,10 @@ from psychopy import event, visual, monitors, core
 from PIL import Image, ImageTk, ImageGrab
 import pandas as pd
 import os
-import csv
 from datetime import datetime
 import json
 import ndjson
 
-cat = sys.argv[1]
-participant = sys.argv[2]
-condition = sys.argv[3]
-country = sys.argv[4]
-experiment_path = sys.argv[5]
-
-strokes_file_path = experiment_path + "/raw_" + cat + ".ndjson"
-
-def tr(a,b):
-    if country == 'SK' or country == 'sk':
-        return b
-    else:
-        return a
-
-start = time.time()
-
-# Initialize Tkinter
-root = tk.Tk()
-
-######### CONFIGURATION OF THE GLOBAL VARIABLES OF THE CANVAS AND SCREENSHOTS ###########
-
-# Set the dimensions of the drawing window
-window_width = 1920
-window_height = 950
-
-# Create the drawing canvas
-canvas = tk.Canvas(root, width=window_width, height=window_height, bg='white')
-canvas.pack()
-
-button = tk.Button(text=tr("If you finished, press the button", "Ak ste skončili, kliknite pre pokračovanie"), command=lambda: quit_program(), height=4)
-button.pack()
 
 # Set the color and size for drawing
 draw_color = 'black'
@@ -67,10 +35,54 @@ latency = 0.0
 temp = 0.0
 margin = 0.0
 
-############################### END OF THE CONFIGURATION ################################
+def open_canvas(_category : str, _participant : str, _condition : str, _country : str, _experiment_path : str):
+    global category, participant, condition, country, experiment_path, start, strokes_file_path
+    category = _category
+    participant = _participant
+    condition = _condition
+    country = _country
+    experiment_path = _experiment_path
+    strokes_file_path = experiment_path + "/raw_" + category + ".ndjson"
+    start = time.time()
+    (root, canvas) = setup_UI()
 
- 
+    # Bind the mouse movement event to the canvas
+    canvas.bind('<B1-Motion>', on_mouse_move)
 
+    # Bind the mouse release event to the canvas
+    canvas.bind('<ButtonRelease-1>', on_mouse_release)
+
+
+    # Start the main Tkinter event loop
+    root.mainloop()
+
+
+def tr(a,b):
+    global country
+    if country == 'SK' or country == 'sk':
+        return b
+    else:
+        return a
+
+def setup_UI() -> "tuple[object, object]":
+
+    # Initialize Tkinter
+    root = tk.Tk()
+    root.attributes('-fullscreen', True)
+
+    ######### CONFIGURATION OF THE GLOBAL VARIABLES OF THE CANVAS AND SCREENSHOTS ###########
+
+    # Set the dimensions of the drawing window
+    #window_width = 1366
+    #window_height = 768
+
+    # Create the drawing canvas
+    canvas = tk.Canvas(root, bg='white')
+    canvas.pack(expand=True)
+
+    button = tk.Button(text=tr("If you finished, press the button", "Ak ste skončili, kliknite pre pokračovanie"), command=lambda: quit_program(), height=4)
+    button.pack()
+    return (root, canvas)
 
 ############ FUNCTIONS TO DRAW AND TO SAVE THE FINAL DRAWINGS #############
 # Define the event handler for mouse movements
@@ -166,7 +178,7 @@ def quit_program():
     time.sleep(0.5)
 
 
-    ImageGrab.grab().crop((65, 65, 1920, 1015)).save(participant + "/" + cat + ".png")
+    ImageGrab.grab().crop((65, 65, 1920, 1015)).save(participant + "/" + category + ".png")
 
     if temp > 0:
         #Pretty sure this is broken: Fix.
@@ -182,7 +194,7 @@ def quit_program():
     timestamp = str(datetime.fromtimestamp(time.time()))
 
     strokes_data = {
-        'word': cat,
+        'word': category,
         'condition': condition,
         'country': country,
         'timestamp': timestamp,
@@ -217,12 +229,3 @@ def quit_program():
 
 ######################### END OF THE FUNCTIONS #############################
 
-# Bind the mouse movement event to the canvas
-canvas.bind('<B1-Motion>', on_mouse_move)
-
-# Bind the mouse release event to the canvas
-canvas.bind('<ButtonRelease-1>', on_mouse_release)
-
-
-# Start the main Tkinter event loop
-root.mainloop()
