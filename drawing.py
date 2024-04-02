@@ -36,7 +36,7 @@ temp = 0.0
 margin = 0.0
 
 def open_canvas(_category : str, _participant : str, _condition : str, _country : str, _experiment_path : str):
-    global category, participant, condition, country, experiment_path, start, strokes_file_path
+    global category, participant, condition, country, experiment_path, start, strokes_file_path, root, canvas
     category = _category
     participant = _participant
     condition = _condition
@@ -77,11 +77,12 @@ def setup_UI() -> "tuple[object, object]":
     #window_height = 768
 
     # Create the drawing canvas
-    canvas = tk.Canvas(root, bg='white')
-    canvas.pack(expand=True)
-
     button = tk.Button(text=tr("If you finished, press the button", "Ak ste skončili, kliknite pre pokračovanie"), command=lambda: quit_program(), height=4)
-    button.pack()
+    button.pack(side="bottom")
+
+    canvas = tk.Canvas(root, bg='white')
+    canvas.pack(anchor='center', expand=True, fill="both")
+
     return (root, canvas)
 
 ############ FUNCTIONS TO DRAW AND TO SAVE THE FINAL DRAWINGS #############
