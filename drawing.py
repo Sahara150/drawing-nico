@@ -9,8 +9,9 @@ import os
 from datetime import datetime
 import json
 import ndjson
-from helper_functions import setup_UI
-from global_static_vars import draw_color, draw_size, experiment_dir
+from global_static_vars import draw_color, draw_size, experiment_dir, country
+from global_static_vars import width_main, width_side, height_side
+from helper_functions import tr
 
 # Store the coordinates of the previous point
 prev_x = None
@@ -32,15 +33,14 @@ latency = 0.0
 temp = 0.0
 margin = 0.0
 
-def open_canvas(_category : str, _participant : str, _condition : str, _country : str, ):
-    global category, participant, condition, country, start, strokes_file_path, root, canvas
+def open_canvas(_category : str, _participant : str, _condition : str):
+    global category, participant, condition, start, strokes_file_path, root, canvas
     category = _category
     participant = _participant
     condition = _condition
-    country = _country
-    strokes_file_path = experiment_dir + "/raw_" + category + ".ndjson"
+    strokes_file_path = experiment_dir + "raw_" + category + ".ndjson"
     start = time.time()
-    (root, canvas) = setup_UI(True)
+    (root, canvas) = setup_UI()
 
     # Bind the mouse movement event to the canvas
     canvas.bind('<B1-Motion>', on_mouse_move)
@@ -52,15 +52,25 @@ def open_canvas(_category : str, _participant : str, _condition : str, _country 
     # Start the main Tkinter event loop
     root.mainloop()
 
+def setup_UI() -> "tuple[object, object]":
 
-def tr(a,b):
-    global country
-    if country == 'SK' or country == 'sk':
-        return b
-    else:
-        return a
+    # Initialize Tkinter
+    root = tk.Tk(screenName="Standardmonitor")
+    #if second_display:
+     #   root.geometry(f"{width_side}x{height_side}+{width_main}+0")
+    root.attributes('-fullscreen', True)
 
+    ######### CONFIGURATION OF THE GLOBAL VARIABLES OF THE CANVAS AND SCREENSHOTS ###########
 
+    # Create the drawing canvas
+
+    button = tk.Button(text=tr("If you finished, press the button", "Ak ste skončili, kliknite pre pokračovanie"), command=lambda: quit_program(), height=4)
+    button.pack(side="bottom")
+
+    canvas = tk.Canvas(root, bg='white')
+    canvas.pack(anchor='center', expand=True, fill="both")
+
+    return (root, canvas)   
 ############ FUNCTIONS TO DRAW AND TO SAVE THE FINAL DRAWINGS #############
 # Define the event handler for mouse movements
 def on_mouse_move(event):
@@ -150,7 +160,7 @@ def alert_window():
     prev_x = None
 
 def quit_program():
-    global total_drawing_time, latency, stroke_count, temp, margin
+    global total_drawing_time, latency, stroke_count, temp, margin, root
 
     data = []
 
