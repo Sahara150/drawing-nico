@@ -9,8 +9,7 @@ import os
 from datetime import datetime
 import json
 import ndjson
-from global_static_vars import draw_color, draw_size, experiment_dir, country
-from global_static_vars import width_main, width_side, height_side
+from global_static_vars import draw_color, draw_size, experiment_dir, line_args
 from helper_functions import tr
 
 # Store the coordinates of the previous point
@@ -185,7 +184,7 @@ def quit_program():
     strokes_data = {
         'word': category,
         'condition': condition,
-        'country': country,
+        'country': line_args['country'],
         'timestamp': timestamp,
         'strokes': strokes,
         'detailed_strokes' : detailed_strokes

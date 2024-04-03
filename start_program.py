@@ -1,7 +1,7 @@
 from drawing import open_canvas
 import os
 from datetime import datetime
-from global_static_vars import images_dir, experiment_dir, country
+from global_static_vars import images_dir, experiment_dir, line_args
 
 
 def draw_ten_times():
@@ -20,8 +20,8 @@ def draw_ten_times():
     path_folder_participant = images_dir + participant_dir
     os.mkdir(path_folder_participant)
 
-    country = "sk"
+    line_args['country'] = "sk"
     for i in range(0,1):
-        open_canvas("robot", path_folder_participant, "robot")
+        open_canvas(f"test {i}", path_folder_participant, "robot")
 
 draw_ten_times()

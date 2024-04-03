@@ -14,4 +14,6 @@ width_main, height_main = 1366, 768
 width_side, height_side = 1920, 1080
 
 ### These variables are set as arguments when executing, so they may differ from initial config
-country = sys.argv[0]
+line_args = {
+    'country': "en"
+}

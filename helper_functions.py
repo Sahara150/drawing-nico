@@ -1,8 +1,7 @@
 import pandas as pd
 from global_static_vars import experiment_dir
 import tkinter as tk
-from global_static_vars import draw_color, draw_size, width_main, width_side, height_side, country
-
+from global_static_vars import draw_color, draw_size, line_args
 
 def read_results(category : str, iteration : int):
     path_results = experiment_dir + f"raw_{category}.ndjson"
@@ -13,6 +12,7 @@ def read_results(category : str, iteration : int):
     return data
 
 def tr(a,b):
+    country = line_args['country']
     if country == 'SK' or country == 'sk':
         return b
     else:
@@ -32,8 +32,6 @@ def setup_UI(second_display : bool = True) -> "tuple[object, object]":
 
     # Initialize Tkinter
     root = tk.Tk()
-    if second_display:
-        root.geometry(f"{width_side}x{height_side}+{width_main}+0")
     root.attributes('-fullscreen', True)
 
     canvas = tk.Canvas(root, bg='white')
