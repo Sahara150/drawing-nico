@@ -2,7 +2,7 @@ from drawing import open_canvas
 import os
 from datetime import datetime
 from global_static_vars import images_dir, experiment_dir, line_args
-from helper_functions import read_results, create_canvas_with_data_from_strokes
+from helper_functions import read_results, create_canvas_with_data_from_strokes, flatten_data, create_canvas_with_flattened_data
 
 
 def draw_ten_times():
@@ -23,8 +23,10 @@ def draw_ten_times():
 
     line_args['country'] = "sk"
     for i in range(0,1):
-        open_canvas(f"test {i}", path_folder_participant, "robot")
+        open_canvas(f"test_{i}", path_folder_participant, "robot")
 
-#draw_ten_times()
-data = read_results("robot", 2)
-create_canvas_with_data_from_strokes(data)
+draw_ten_times()
+#data = read_results("test_0", 3)
+#flattened_data = flatten_data(data)
+#create_canvas_with_data_from_strokes(data)
+#create_canvas_with_flattened_data(flattened_data)

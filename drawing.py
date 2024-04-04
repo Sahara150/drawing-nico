@@ -1,4 +1,6 @@
-﻿import tkinter as tk
+﻿# THIS CODE GOT COPIED FROM PREVIOUS EXPERIMENTS AND MODIFIED
+# DO NOT GRADE, I DID NOT PRODUCE THIS CODE
+import tkinter as tk
 import sys
 import time
 import numpy as np
