@@ -21,6 +21,7 @@ x = []
 y = []
 t = []
 strokes = []
+#This actually contains the same info as strokes, but by point instead of separation by stroke
 detailed_strokes = []
 
 # Keep track of the number of strokes
@@ -93,10 +94,11 @@ def on_mouse_move(event):
     y.append(c_y)
     temp = int(c_t-start_drawing_time)
     t.append(temp)
-
+    detailed_strokes.append([c_x, c_y, c_t])
+    
     if prev_x is not None and prev_y is not None:
-        canvas.create_line(prev_x, prev_y, c_x, c_y, fill=draw_color, width=draw_size)
-        detailed_strokes.append([c_x, c_y, c_t])
+        canvas.create_line(prev_x, prev_y, c_x, c_y, fill=draw_color, width=draw_size, tags=('stroke', stroke_count))
+    
     prev_x = c_x
     prev_y = c_y
 
@@ -169,7 +171,7 @@ def quit_program():
     ImageGrab.grab().crop((65, 65, 1920, 1015)).save(participant + "/" + category + ".png")
 
     if temp > 0:
-        #Pretty sure this is broken: Fix.
+        #BUG: Pretty sure this is broken: Fix.
         temp2 = time.time() - margin
         total_drawing_time = temp + temp2
     else:

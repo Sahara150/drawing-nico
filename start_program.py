@@ -2,6 +2,7 @@ from drawing import open_canvas
 import os
 from datetime import datetime
 from global_static_vars import images_dir, experiment_dir, line_args
+from helper_functions import read_results, create_canvas_with_data
 
 
 def draw_ten_times():
@@ -24,4 +25,6 @@ def draw_ten_times():
     for i in range(0,1):
         open_canvas(f"test {i}", path_folder_participant, "robot")
 
-draw_ten_times()
+#draw_ten_times()
+data = read_results("accessibility", 0)
+create_canvas_with_data(data)
