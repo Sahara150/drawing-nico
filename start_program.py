@@ -2,7 +2,7 @@ from drawing import open_canvas
 import os
 from datetime import datetime
 from global_static_vars import images_dir, experiment_dir, line_args
-from helper_functions import read_results, create_canvas_with_data
+from helper_functions import read_results, create_canvas_with_data_from_strokes
 
 
 def draw_ten_times():
@@ -26,5 +26,5 @@ def draw_ten_times():
         open_canvas(f"test {i}", path_folder_participant, "robot")
 
 #draw_ten_times()
-data = read_results("accessibility", 0)
-create_canvas_with_data(data)
+data = read_results("robot", 2)
+create_canvas_with_data_from_strokes(data)

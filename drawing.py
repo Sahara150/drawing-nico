@@ -21,8 +21,6 @@ x = []
 y = []
 t = []
 strokes = []
-#This actually contains the same info as strokes, but by point instead of separation by stroke
-detailed_strokes = []
 
 # Keep track of the number of strokes
 stroke_count = 0
@@ -94,7 +92,6 @@ def on_mouse_move(event):
     y.append(c_y)
     temp = int(c_t-start_drawing_time)
     t.append(temp)
-    detailed_strokes.append([c_x, c_y, c_t])
     
     if prev_x is not None and prev_y is not None:
         canvas.create_line(prev_x, prev_y, c_x, c_y, fill=draw_color, width=draw_size, tags=('stroke', stroke_count))
@@ -106,8 +103,6 @@ def on_mouse_move(event):
 # Define the event handler for releasing the mouse button
 def on_mouse_release(event):
     global prev_x, prev_y, stroke_count, total_drawing_time, x, y, t, strokes
-    #Appending invalid to signal end of stroke
-    detailed_strokes.append([-1, -1, -1])
     prev_x = None
     prev_y = None
 
@@ -188,8 +183,7 @@ def quit_program():
         'condition': condition,
         'country': line_args['country'],
         'timestamp': timestamp,
-        'strokes': strokes,
-        'detailed_strokes' : detailed_strokes
+        'strokes': strokes
     }
 
     # This is super ugly, use dependency for that
