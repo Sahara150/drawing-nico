@@ -11,7 +11,7 @@ import os
 from datetime import datetime
 import json
 import ndjson
-from global_static_vars import draw_color, draw_size, experiment_dir, line_args
+from global_static_vars import draw_color, draw_size, experiment_dir, line_args, lower_edge_canvas, width_side
 from helper_functions import tr
 
 # Store the coordinates of the previous point
@@ -165,7 +165,7 @@ def quit_program():
     time.sleep(0.5)
 
 
-    ImageGrab.grab().crop((65, 65, 1920, 1015)).save(participant + "/" + category + ".png")
+    ImageGrab.grab().crop((65, 65, width_side, lower_edge_canvas)).save(participant + "/" + category + ".png")
 
     if temp > 0:
         #BUG: Pretty sure this is broken: Fix.

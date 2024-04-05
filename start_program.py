@@ -2,8 +2,9 @@ from drawing import open_canvas
 import os
 from datetime import datetime
 from global_static_vars import images_dir, experiment_dir, line_args
-from helper_functions import read_results, create_canvas_with_data_from_strokes, flatten_data, create_canvas_with_flattened_data
-
+from helper_functions import read_results, flatten_data, transform_coordinates
+from helper_functions import create_canvas_with_data_from_strokes, create_canvas_with_flattened_data
+from robot_setup import setup_robot, look_down
 
 def draw_ten_times():
 
@@ -23,10 +24,15 @@ def draw_ten_times():
 
     line_args['country'] = "sk"
     for i in range(0,1):
-        open_canvas(f"test_{i}", path_folder_participant, "robot")
+        open_canvas(f"display_{i}", path_folder_participant, "robot")
 
-draw_ten_times()
-#data = read_results("test_0", 3)
+#draw_ten_times()
+robot = setup_robot()
+look_down(robot)
+#data = read_results("accessibility", 0)
 #flattened_data = flatten_data(data)
 #create_canvas_with_data_from_strokes(data)
 #create_canvas_with_flattened_data(flattened_data)
+# Setting true for now, as we will print it on canvas and not yet draw it
+#mirrored_data = transform_coordinates(flattened_data, True)
+#create_canvas_with_flattened_data(mirrored_data)
