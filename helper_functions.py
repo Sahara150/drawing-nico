@@ -5,6 +5,15 @@ import numpy
 from rdp import rdp
 from global_static_vars import draw_color, draw_size, line_args, lower_edge_canvas, width_side
 from global_static_vars import max_rescale, drawing_area_x, drawing_area_y, center_y, center_x
+
+def read_newest_results(category : set):
+    path_results = experiment_dir + f"raw_{category}.ndjson"
+    file = pd.read_json(path_results, lines=True)
+    # This gets the detailed strokes for each iteration of category
+    strokes = file["strokes"]
+    data = strokes[len(strokes)-1]
+    return data
+
 def read_results(category : str, iteration : int):
     path_results = experiment_dir + f"raw_{category}.ndjson"
     file = pd.read_json(path_results, lines=True)

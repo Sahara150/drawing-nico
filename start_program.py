@@ -1,12 +1,14 @@
 from drawing import open_canvas
 import os
 from datetime import datetime
+import time
+import threading
 from global_static_vars import images_dir, experiment_dir, line_args
-from helper_functions import read_results, flatten_data, transform_coordinates, rescale_and_shift_image
+from helper_functions import read_newest_results, flatten_data, transform_coordinates, rescale_and_shift_image
 from helper_functions import create_canvas_with_data_from_strokes, create_canvas_with_flattened_data
-from robot_setup import setup_robot, look_down
+from robot_setup import load_robot, look_down, robot_draws_strokes
 
-def draw_ten_times():
+def user_draws():
 
     #Create image dir if not yet existant
     if os.path.isdir(images_dir):
@@ -24,17 +26,25 @@ def draw_ten_times():
 
     line_args['country'] = "sk"
     for i in range(0,1):
-        open_canvas(f"display_{i}", path_folder_participant, "robot")
+        open_canvas(f"robot_repeats_{i}", path_folder_participant, "robot")
 
-#draw_ten_times()
-#robot = setup_robot()
-#look_down(robot)
-data = read_results("test_0", 1)
+# We're not putting this in an extra agent, as the robot should just wake up and look down
+# once in the beginning
+robot = load_robot()
+# Sleep 3 seconds til robot got woken up
+time.sleep(3)
+look_down(robot)
+user_draws()
+data = read_newest_results("robot_repeats_0")
 flattened_data = flatten_data(data)
 create_canvas_with_data_from_strokes(data)
-create_canvas_with_flattened_data(flattened_data)
-# Setting true for now, as we will print it on canvas and not yet draw it
+#create_canvas_with_flattened_data(flattened_data)
+# Setting true for now, as we will use the learned model with Perceptrons
 mirrored_data = transform_coordinates(flattened_data, True)
-create_canvas_with_flattened_data(mirrored_data)
+mirrored_data_left = transform_coordinates(flatten_data, False)
 rescaled_data = rescale_and_shift_image(mirrored_data)
-create_canvas_with_flattened_data(rescaled_data)
+rescaled_data_left = rescale_and_shift_image(mirrored_data_left)
+drawing_robot_thread = threading.Thread(robot_draws_strokes, rescaled_data, rescaled_data_left)
+#TODO Canvas thread
+drawing_robot_thread.start()
+drawing_robot_thread.join()
