@@ -1,6 +1,5 @@
 import pandas as pd
 from global_static_vars import experiment_dir
-import tkinter as tk
 import numpy
 from rdp import rdp
 from global_static_vars import draw_color, draw_size, line_args, lower_edge_canvas, width_side
@@ -99,44 +98,3 @@ def rescale_coordinates(item: list[list[int]], rescale_factor: float):
 def shift_data(item: list[list[int]], shift_x: float, shift_y: float):
     return list(map(lambda coordinate: [coordinate[0] + shift_x, coordinate[1] + shift_y], item))
     
-######### CANVAS HELPERS ###########
-
-def create_canvas_with_data_from_strokes(data : list[list[list[int]]]):
-    (root, canvas) = setup_UI()
-    for stroke in data:
-        for i in range(1, len(stroke[0])): 
-            #canvas.create_line(stroke[0][i-1], stroke[1][i-1], stroke[0][i], stroke[1][i], fill=draw_color, width=draw_size)
-            #HOME SOLUTION: multiplies the pixels by 0.71 due to smaller screen
-            canvas.create_line(stroke[0][i-1]*0.71, stroke[1][i-1]*0.71, stroke[0][i]*0.71, stroke[1][i]*0.71, fill=draw_color, width=draw_size)
-    root.mainloop()        
-
-def create_canvas_with_flattened_data(data : list[list[list[int]]]):
-    (root, canvas) = setup_UI()
-    for stroke in data:
-        for i in range(1, len(stroke)):
-            #canvas.create_line(stroke[i-1][0], stroke[i-1][1], stroke[i][0], stroke[i][1], fill='red', width=draw_size)
-            #HOME SOLUTION: multiplies the pixels by 0.71 due to smaller screen
-            canvas.create_line(stroke[i-1][0]*0.71, stroke[i-1][1]*0.71, stroke[i][0]*0.71, stroke[i][1]*0.71, fill='red', width=draw_size)
-    root.mainloop()
-
-# TODO: Old cold, clean up before submission
-def create_canvas_with_data_from_detailed_strokes(data : list[list[int]]):
-    (root, canvas) = setup_UI()
-    for i in range(1, len(data)):
-        if data[i-1][2] != -1:
-            # No end of stroke before, draw connection
-            canvas.create_line(data[i-1][0], data[i-1][1], data[i][0], data[i][1], fill=draw_color, width=draw_size)
-            #HOME SOLUTION: multiplies the pixels by 0.71
-            #canvas.create_line(data[i-1][0]*0.71, data[i-1][1]*0.71, data[i][0]*0.71, data[i][1]*0.71, fill=draw_color, width=draw_size)
-    root.mainloop()
-
-def setup_UI() -> "tuple[object, object]":
-
-    # Initialize Tkinter
-    root = tk.Tk()
-    root.attributes('-fullscreen', True)
-
-    canvas = tk.Canvas(root, bg='white')
-    canvas.pack(anchor='center', expand=True, fill="both")
-
-    return (root, canvas)   
