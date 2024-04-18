@@ -1,5 +1,9 @@
 import tkinter as tk
 from global_static_vars import draw_color, draw_size
+from PIL import ImageGrab
+from global_static_vars import width_side, height_side, images_dir
+import os
+from datetime import datetime
 
 ######### CANVAS HELPERS ###########
 prev_x = None
@@ -18,11 +22,7 @@ def create_canvas_with_data_from_strokes(data : list[list[list[int]]]):
 
 def create_canvas_with_flattened_data(data : list[list[list[int]]]):
     (root, canvas) = setup_UI()
-    for stroke in data:
-        for i in range(1, len(stroke)):
-            #canvas.create_line(stroke[i-1][0], stroke[i-1][1], stroke[i][0], stroke[i][1], fill='red', width=draw_size)
-            #HOME SOLUTION: multiplies the pixels by 0.71 due to smaller screen
-            canvas.create_line(stroke[i-1][0]*0.71, stroke[i-1][1]*0.71, stroke[i][0]*0.71, stroke[i][1]*0.71, fill='red', width=draw_size)
+    draw_template(data, canvas)
     root.mainloop()
 
 # TODO: Old code, clean up before submission
@@ -61,22 +61,41 @@ def on_mouse_move(event):
     c_y = event.y
     
     if prev_x is not None and prev_y is not None:
-        canvas.create_line(prev_x, prev_y, c_x, c_y, fill=draw_color, width=draw_size, tags=('stroke', stroke_count))
+        canvas.create_line(prev_x, prev_y, c_x, c_y, fill=draw_color, width=draw_size)
     
     prev_x = c_x
     prev_y = c_y
 
-def open_canvas_for_robot():
+def open_canvas_for_robot(data : list[list[list[int]]]):
     global canvas, root
-    (canvas, root) = setup_UI()
-
+    (root, canvas) = setup_UI()
+    draw_template(data, canvas)
     # Bind the mouse movement event to the canvas
     canvas.bind('<B1-Motion>', on_mouse_move)
 
     # Bind the mouse release event to the canvas
     canvas.bind('<ButtonRelease-1>', on_mouse_release)
 
-    root.mainLoop()
+    root.bind("<<close_canvas>>", close_canvas_event)
+    root.mainloop()
 
 def close_canvas():
+    now = datetime.now()
+    date_hour = now.strftime("_%d-%m-%Y_%H-%M-%S")
+    participant_dir = "nicorepeats" + str(date_hour)
+    path_folder_participant = images_dir + participant_dir
+    os.mkdir(path_folder_participant)
+
+    ImageGrab.grab().crop((65, 65, width_side, height_side)).save(images_dir + participant_dir + "/" + "drawing.png")
+
+    root.event_generate("<<close_canvas>>", when="tail", state=123) # trigger event in main thread
+
+def close_canvas_event(evt):        
     root.destroy()
+
+def draw_template(data : list[list[list[int]]], canvas):
+    for stroke in data:
+        for i in range(1, len(stroke)):
+            canvas.create_line(stroke[i-1][0], stroke[i-1][1], stroke[i][0], stroke[i][1], fill='red', width=draw_size)
+            #HOME SOLUTION: multiplies the pixels by 0.71 due to smaller screen
+            #canvas.create_line(stroke[i-1][0]*0.71, stroke[i-1][1]*0.71, stroke[i][0]*0.71, stroke[i][1]*0.71, fill='red', width=draw_size)

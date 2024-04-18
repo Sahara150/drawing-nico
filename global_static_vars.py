@@ -21,9 +21,9 @@ default_speed = 0.08
 max_rescale = 1.5
 #The size of the drawing field the robot can use
 drawing_area_x = 1592
-drawing_area_y = 850
+drawing_area_y = 840
 left_limit_x = 164
-center_y = drawing_area_y/2
+center_y = drawing_area_y/2 + 10
 center_x = width_side/2
 
 # Static vars of robot

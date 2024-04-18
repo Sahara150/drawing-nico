@@ -68,7 +68,7 @@ def move_to_position_through_time(target_positions, duration):
 
 # Instead of a dictionary, this function requires only a list of positions and the corresponding 
 # dofs
-def move_to_position_through_time(dofs, target_positions : list[int], duration):
+def move_to_position_through_time_ext(dofs, target_positions : list[float], duration):
     if duration == 0:
         return
     global robot
@@ -76,19 +76,19 @@ def move_to_position_through_time(dofs, target_positions : list[int], duration):
     import copy
     # get the current positions of all joints to move
     current_positions = copy.deepcopy(target_positions)
-    for joint in current_positions:
-        current_positions[joint] = robot.getAngle(dofs[joint])
+    for index in range(len(current_positions)):
+        current_positions[index] = robot.getAngle(dofs[index])
     speed_to_reach = [
         abs(
             (float(current_positions[k]) - float(target_positions[k])) / float(1260*duration)
         )
-        for k in current_positions
+        for k in range(len(current_positions))
     ]
-    for joi in target_positions:
+    for ind in range(len(target_positions)):
         robot.setAngle(
-            dofs[joi],
-            float(joi),
-            speed_to_reach[joi],
+            dofs[ind],
+            target_positions[ind],
+            speed_to_reach[ind],
         )
 
 def play_movement(dofs,poses,durations):
