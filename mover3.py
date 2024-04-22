@@ -1,7 +1,6 @@
 from nicomotion.Motion import Motion
 import time
 import numpy as np
-from agentspace import space
 
 motorConfig = './nico_humanoid_upper_rh7d_ukba.json'
 robot = Motion(motorConfig=motorConfig)
@@ -92,14 +91,11 @@ def move_to_position_through_time_ext(dofs, target_positions : list[float], dura
         )
 
 def play_movement(dofs,poses,durations):
-    space["stop"] = False
     for pose,duration in zip(poses,durations):
         # Move all joints in the subset to the postion
         command = {dof : angle for dof, angle in zip(dofs, pose) if dof != 'timestamp' }
         move_to_position_through_time(command, duration)
         time.sleep(duration)
-        if space(default=False)["stop"]:
-            break
 
 if __name__ == "__main__":
  

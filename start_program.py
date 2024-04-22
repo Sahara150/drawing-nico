@@ -5,8 +5,8 @@ import time
 import threading
 from global_static_vars import images_dir, experiment_dir, line_args
 from helper_functions import read_newest_results, flatten_data, transform_coordinates, rescale_and_shift_image
-from canvas_functions import create_canvas_with_data_from_strokes, open_canvas_for_robot, close_canvas
-from robot_setup import load_robot, look_down, robot_draws_strokes
+from canvas_functions import create_canvas_with_data_from_strokes, create_canvas_with_flattened_data, open_canvas_for_robot, close_canvas
+#from robot_setup import load_robot, look_down, robot_draws_strokes
 
 def user_draws():
 
@@ -30,20 +30,20 @@ def user_draws():
 
 # We're not putting this in an extra agent, as the robot should just wake up and look down
 # once in the beginning
-robot = load_robot()
+#robot = load_robot()
 # Sleep 3 seconds til robot got woken up
-time.sleep(3)
-look_down(robot)
-user_draws()
+#time.sleep(3)
+#look_down(robot)
+#user_draws()
 data = read_newest_results("robot_repeats_0")
 flattened_data = flatten_data(data)
-#create_canvas_with_data_from_strokes(data)
-#create_canvas_with_flattened_data(flattened_data)
+create_canvas_with_data_from_strokes(data)
+create_canvas_with_flattened_data(flattened_data)
 # Setting true for now, as we will use the learned model with Perceptrons
-mirrored_data = transform_coordinates(flattened_data, True)
-mirrored_data_left = transform_coordinates(flattened_data, False)
-rescaled_data = list(rescale_and_shift_image(mirrored_data))
-rescaled_data_left = rescale_and_shift_image(mirrored_data_left)
-drawing_robot_thread = threading.Thread(target = robot_draws_strokes, args = (rescaled_data, rescaled_data_left))
-drawing_robot_thread.start()
-open_canvas_for_robot(rescaled_data)
+#mirrored_data = transform_coordinates(flattened_data, True)
+#mirrored_data_left = transform_coordinates(flattened_data, False)
+#rescaled_data = list(rescale_and_shift_image(mirrored_data))
+#rescaled_data_left = rescale_and_shift_image(mirrored_data_left)
+#drawing_robot_thread = threading.Thread(target = robot_draws_strokes, args = (rescaled_data, rescaled_data_left))
+#drawing_robot_thread.start()
+#open_canvas_for_robot(rescaled_data)

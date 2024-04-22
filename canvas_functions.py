@@ -86,7 +86,7 @@ def close_canvas():
     path_folder_participant = images_dir + participant_dir
     os.mkdir(path_folder_participant)
 
-    ImageGrab.grab().crop((65, 65, width_side, height_side)).save(images_dir + participant_dir + "/" + "drawing.png")
+    ImageGrab.grab().crop((0, 0, width_side, height_side)).save(images_dir + participant_dir + "/" + "drawing.png")
 
     root.event_generate("<<close_canvas>>", when="tail", state=123) # trigger event in main thread
 
@@ -96,6 +96,6 @@ def close_canvas_event(evt):
 def draw_template(data : list[list[list[int]]], canvas):
     for stroke in data:
         for i in range(1, len(stroke)):
-            canvas.create_line(stroke[i-1][0], stroke[i-1][1], stroke[i][0], stroke[i][1], fill='red', width=draw_size)
+            #canvas.create_line(stroke[i-1][0], stroke[i-1][1], stroke[i][0], stroke[i][1], fill='red', width=draw_size)
             #HOME SOLUTION: multiplies the pixels by 0.71 due to smaller screen
-            #canvas.create_line(stroke[i-1][0]*0.71, stroke[i-1][1]*0.71, stroke[i][0]*0.71, stroke[i][1]*0.71, fill='red', width=draw_size)
+            canvas.create_line(stroke[i-1][0]*0.71, stroke[i-1][1]*0.71, stroke[i][0]*0.71, stroke[i][1]*0.71, fill='red', width=draw_size)

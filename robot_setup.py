@@ -19,6 +19,7 @@ def load_robot() -> Motion :
 
 def look_down(robot : Motion):
     robot.setAngle("head_y", -40.0, default_speed)
+    robot.setAngle("head_z", 0.0, default_speed)
 
 def setup_robot(robot : Motion):
     robot.enableTorqueAll()
@@ -51,7 +52,7 @@ def robot_draws_strokes(strokes: list[list[list[int]]], mirrored_strokes : list[
         angles_right = [limit_index_finger(output) for output in angles_right]
         angles_left = [limit_index_finger(output) for output in angles_left]
         rescaled_angles_right = list(np.round(np.array(angles_right)*180.0))
-        rescaled_angles_left = list(np.array(angles_left)*180.0)
+        rescaled_angles_left = list(np.round(np.array(angles_left)*180.0))
 
         (poses_right, durations_right) = get_poses_and_durations_right(rescaled_angles_right)
         # This will have side effects on poses_right & durations_right. We still made it a function to 
@@ -175,4 +176,5 @@ def limit_index_finger(output: list[float]):
     return output
 
 def duration_movement(angles_curr : list[float], angles_old : list[float]):
+    return 0
     return abs(angles_curr[0] - angles_old[0])*0.2 + abs(angles_curr[1] - angles_old[1]) * 0.2
