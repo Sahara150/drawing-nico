@@ -30,6 +30,7 @@ def store_touch(point : tuple[int, int]):
     for dof in rightArmDofs:
         angles.append(robot.getAngle(dof))
     correct_data.append(angles + [point[0], point[1]])
+    print(f"Old data: {initial_data[position]}, Correct data: {correct_data[-1]}")
     move = threading.Thread(target=play_movement, args=(initial_data[position], initial_data[position+1]))
     position += 1
     if position < len(initial_data):
