@@ -5,10 +5,9 @@ from keras.models import load_model
 import keras
 import numpy as np
 from mover3 import move_to_position_through_time_ext, play_movement, robot
-from canvas_functions import close_canvas
 import time
 
-model = load_model("perceptron_clean.h5", safe_mode=True, custom_objects={
+model = load_model("../perceptron.h5", safe_mode=True, custom_objects={
     'mse'.encode('cp1252'): keras.losses.mean_squared_error
 })
 print(model.summary())
@@ -23,90 +22,6 @@ def look_down(robot : Motion):
 
 def setup_robot(robot : Motion):
     robot.enableTorqueAll()
-
-def robot_draws_strokes(strokes: list[list[list[int]]], mirrored_strokes : list[list[list[int]]]):
-    #Wait a second so the robot won't start drawing, before canvas is opened on main thread
-    time.sleep(1)
-    strokes = list(strokes)
-    mirrored_strokes = list(mirrored_strokes)
-    # At start of drawing, move both arms to parking position, then go through ready and steady  
-    # with right arm
-    move_to_position_through_time_ext(leftArmDofs, parking_position[:-1], parking_time)  
-    poses_right_arm = [
-        parking_position[:-1],
-        ready_position[:-1],
-        steady_position[:-1]
-    ]
-    durations_right_arm = [
-        parking_time,
-        (ready_position[-1]-parking_position[-1])/1000.0,
-        (steady_position[-1]-ready_position[-1])/1000.0
-    ]   
-
-    play_movement(rightArmDofs, poses_right_arm, durations_right_arm)       
-    
-    # We get each point, get the angles for it and then implement the 
-    # continuous movement
-    for index, stroke in enumerate(strokes):
-        (angles_right, angles_left) = get_angles_for_stroke(stroke, mirrored_strokes[index])
-        angles_right = [limit_index_finger(output) for output in angles_right]
-        angles_left = [limit_index_finger(output) for output in angles_left]
-        rescaled_angles_right = list(np.round(np.array(angles_right)*180.0))
-        rescaled_angles_left = list(np.round(np.array(angles_left)*180.0))
-
-        (poses_right, durations_right) = get_poses_and_durations_right(rescaled_angles_right)
-        # This will have side effects on poses_right & durations_right. We still made it a function to 
-        # improve readability in the main code
-        (poses_left, durations_left) = get_poses_and_durations_left(rescaled_angles_left, poses_right, durations_right)
-        
-        play_movement(rightArmDofs, poses_right, durations_right)
-        play_movement(leftArmDofs, poses_left, durations_left)    
-    
-    # At end of drawing, move left arm back to parking and right arm through steady & ready
-    # back to parking
-
-    move_to_position_through_time_ext(leftArmDofs, parking_position[:-1], parking_time)  
-    poses_right_arm = [
-        steady_position[:-1],
-        ready_position[:-1],
-        parking_position[:-1]
-    ]
-    durations_right_arm = [
-        (steady_position[-1]-ready_position[-1])/1000.0,
-        (ready_position[-1]-parking_position[-1])/1000.0,
-        parking_time
-    ]   
-
-    play_movement(rightArmDofs, poses_right_arm, durations_right_arm)   
-
-    time.sleep(5)
-    # When drawing robot thread is finished, we can close canvas
-    close_canvas()    
-    
-#This returns the poses & durations for the right arm.
-#If the right arm has any angles, it also moves left arm back to parking position.
-def get_poses_and_durations_right(rescaled_angles_right : list[list[float]]):
-    poses_right = []
-    durations_right = []
-    if len(rescaled_angles_right) != 0:
-        #If right arm will draw, put left arm away
-        # TODO: Check, if left arm is already in parking position, to save time if it is
-        move_to_position_through_time_ext(leftArmDofs, parking_position[:-1], parking_time)            
-        poses_right.append([(angle if index != 5 else -180.0) for index, angle in enumerate(rescaled_angles_right[0])])
-        poses_right += rescaled_angles_right
-        poses_right.append([(angle if index != 5 else -180.0) for index, angle in enumerate(rescaled_angles_right[-1])])
-        touch_timestamp = 450 + rescaled_angles_right[0][0]*250
-        durations_right += [
-            round(touch_timestamp)/1000.0,
-            0.25
-        ]
-        
-        # TODO: Test if shoulder joint is most sensible predictor of needed time or 
-        # what would be better time calculation
-        durations_right += [ duration_movement(angles, rescaled_angles_right[index-1]) for index, angles in enumerate(rescaled_angles_right[1:])]
-        durations_right.append(0.25)
-
-    return (poses_right, durations_right)
 
 # This returns the poses_left & durations_left
 # It also adds elements to poses_right & durations_right

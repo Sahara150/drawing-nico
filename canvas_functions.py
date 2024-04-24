@@ -96,6 +96,6 @@ def close_canvas_event(evt):
 def draw_template(data : list[list[list[int]]], canvas):
     for stroke in data:
         for i in range(1, len(stroke)):
-            #canvas.create_line(stroke[i-1][0], stroke[i-1][1], stroke[i][0], stroke[i][1], fill='red', width=draw_size)
+            canvas.create_line(stroke[i-1][0], stroke[i-1][1], stroke[i][0], stroke[i][1], fill='red', width=draw_size)
             #HOME SOLUTION: multiplies the pixels by 0.71 due to smaller screen
-            canvas.create_line(stroke[i-1][0]*0.71, stroke[i-1][1]*0.71, stroke[i][0]*0.71, stroke[i][1]*0.71, fill='red', width=draw_size)
+            #canvas.create_line(stroke[i-1][0]*0.71, stroke[i-1][1]*0.71, stroke[i][0]*0.71, stroke[i][1]*0.71, fill='red', width=draw_size)
