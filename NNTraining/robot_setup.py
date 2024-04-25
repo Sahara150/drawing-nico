@@ -7,7 +7,7 @@ import numpy as np
 from mover3 import move_to_position_through_time_ext, play_movement, robot
 import time
 
-model = load_model("../perceptron.h5", safe_mode=True, custom_objects={
+model = load_model("../perceptron_high_data.h5", safe_mode=True, custom_objects={
     'mse'.encode('cp1252'): keras.losses.mean_squared_error
 })
 print(model.summary())

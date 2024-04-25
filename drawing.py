@@ -183,6 +183,7 @@ def quit_program():
     strokes_data = {
         'word': category,
         'condition': condition,
+        'latency': latency,
         'country': line_args['country'],
         'timestamp': timestamp,
         'strokes': strokes

@@ -5,8 +5,10 @@ corrected_data = np.loadtxt("corrected_dataset.npy")
 
 def create_data_grid():
     data_grid = []
-    for x in range(164, 1800, 32):
-        for y in range(0, 860, 32):
+    for x in range(230, 1880, 32):
+    #for x in range(164, 1800, 32):
+        for y in range(60, 910, 32):
+        #for y in range(0, 860, 32):
             data_grid.append([x, y])
     return data_grid        
 

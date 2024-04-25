@@ -10,6 +10,15 @@ prev_x = None
 prev_y = None
 canvas = None
 root = None
+x = []
+y = []
+strokes = []
+stroke_count = 0
+
+
+def increase_stroke_count():
+    global stroke_count
+    stroke_count += 1
 
 def create_canvas_with_data_from_strokes(data : list[list[list[int]]]):
     (root, canvas) = setup_UI()
@@ -47,10 +56,17 @@ def setup_UI() -> "tuple[object, object]":
 
     return (root, canvas)   
 
-# TODO: Actually, we need to store all the strokes for the robot, so we can compare them to should-be
 def on_mouse_release(event):
-    global prev_x, prev_y
+    global prev_x, prev_y, x, y, stroke_count
+    #We will not increase stroke count here, but manually in robot, because
+    # there may be unintentional stroke interruptions and that way the error function
+    # still knows which stroke it belongs to
     # Just setting last coordinate to none, so that new stroke begins
+    strokes.append([x, y, stroke_count])
+
+    x = []
+    y = []
+    
     prev_x = None
     prev_y = None
 
@@ -59,6 +75,10 @@ def on_mouse_move(event):
 
     c_x = event.x
     c_y = event.y
+
+    x.append(c_x)
+    y.append(c_y)
+
     
     if prev_x is not None and prev_y is not None:
         canvas.create_line(prev_x, prev_y, c_x, c_y, fill=draw_color, width=draw_size)

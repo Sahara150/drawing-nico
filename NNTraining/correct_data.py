@@ -8,6 +8,7 @@ import threading
 from data_grid import get_moves_for_data_grid, create_data_grid
 
 rightArmDofs = ['r_shoulder_z','r_shoulder_y','r_arm_x','r_elbow_y','r_wrist_z','r_wrist_x','r_thumb_z','r_thumb_x','r_indexfinger_x','r_middlefingers_x']
+leftArmDofs = ['l_shoulder_z', 'l_shoulder_y', 'l_arm_x', 'l_elbow_y', 'l_wrist_z', 'l_wrist_x', 'l_thumb_z', 'l_thumb_x', 'l_indexfinger_x', 'l_middlefingers_x']
 parking_position = [-8.0, -15.0, 16.0, 74.0, -24.0, 35.0, -71.0, -104.0, -180.0, -180.0, 0]
 ready_position = [-8.0, 46.0, 13.0, 99.0, 44.0, 99.0, -70.0, 32.0, -180.0, 180.0, 1200]
 steady_position = [13.0, 36.0, 25.0, 106.0, 66.0, -180.0, -70.0, 26.0, -180.0, 172.0, 1800]
@@ -35,7 +36,7 @@ def store_touch(point : tuple[int, int]):
     global quit, position, last_one
     time.sleep(0.5)
     angles = []
-    for dof in rightArmDofs:
+    for dof in leftArmDofs:
         angles.append(robot.getAngle(dof))
     correct_data.append(np.concatenate((np.around(angles, decimals=2), np.array([point[0], point[1]]))))
     print(f"Old data: {last_one}, Correct data: {correct_data[-1]}")
@@ -48,9 +49,9 @@ def store_touch(point : tuple[int, int]):
         move.start()
     else:
         #np.savetxt('corrected_dataset.npy', correct_data, fmt='%.2f')
-        np.savetxt('datagrid.npy', correct_data, fmt='%.2f')
+        np.savetxt('datagrid_left.npy', correct_data, fmt='%.2f')
         quit = True
-        touch_timestamp = 1250 + initial_data[-1][0]*250  
+        touch_timestamp = 1250 + last_one[0]*250  
         poses = [
             ready_position[:-1],
             steady_position[:-1],
@@ -61,22 +62,23 @@ def store_touch(point : tuple[int, int]):
             (steady_position[-1]-ready_position[-1])/1000.0,
             (ready_position[-1]-parking_position[-1])/1000.0
         ]
-        play_movement(rightArmDofs, poses, durations)
+        play_movement(leftArmDofs, poses, durations)
 
 
 def execute_movement(old_movement : list[float], next_movement : list[float]):
     move_up = [ (angle if index != 5 else -180.0) for index, angle in enumerate(old_movement) ]
     move_over = [ (angle if index != 5 else -180.0) for index, angle in enumerate(next_movement) ]
-    while not robot.getAngle('r_wrist_x') <= -177.0:
+    while not robot.getAngle('l_wrist_x') <= -177.0:
+    #while not robot.getAngle('r_wrist_x') <= -177.0:
         # Perform this until robot obeys
-        move_to_position_through_time_ext(rightArmDofs, move_up, 0.25)
+        move_to_position_through_time_ext(leftArmDofs, move_up, 0.25)
         print("Move up")
         time.sleep(2)
-    move_to_position_through_time_ext(rightArmDofs, move_over, 1)
+    move_to_position_through_time_ext(leftArmDofs, move_over, 1)
     print("Move over")
     time.sleep(3)
     print("Move down")
-    move_to_position_through_time_ext(rightArmDofs, next_movement, 0.25)
+    move_to_position_through_time_ext(leftArmDofs, next_movement, 0.25)
 
 def create_pygame_window():
     global quit
@@ -148,4 +150,4 @@ durations = [
     touch_timestamp/1000.0
 ]
 
-play_movement(rightArmDofs, poses, durations)
+play_movement(leftArmDofs, poses, durations)
