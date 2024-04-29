@@ -43,3 +43,6 @@ line_args = {
     'participant': "nicodraws",
     'path_folder_participant': "empty"
 }
+
+categories_no_imitation = ["leaf", "spider", "pizza", "palm tree", "sheep"]
+categories_imitation = ["flower", "light bulb", "cake", "face", "bee"]

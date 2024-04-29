@@ -6,6 +6,8 @@ from global_static_vars import line_args, lower_edge_canvas, width_side
 from global_static_vars import max_rescale, drawing_area_x, drawing_area_y, center_y, center_x
 from canvas_functions import stroke_count
 from shapely.geometry import LineString, Point
+import os
+import ndjson
 
 def read_newest_results(category : set):
     path_results = experiment_dir + f"raw_{category}.ndjson"
@@ -22,6 +24,20 @@ def read_results(category : str, iteration : int):
     strokes = file["strokes"]
     data = strokes[iteration]
     return data
+
+def append_to_ndjson(file_path, new_data):
+    # Read existing data if file exists, otherwise start with an empty list
+    data = []
+    if os.path.isfile(file_path):
+        with open(file_path, 'r') as file:
+            data = ndjson.load(file)
+
+    # Append the new data
+    data.append(new_data)
+
+    # Write all data back to the file
+    with open(file_path, 'w') as file:
+        ndjson.dump(data, file)
 
 def tr(a,b):
     country = line_args['country']

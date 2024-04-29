@@ -1,6 +1,7 @@
 from nicomotion.Motion import Motion
 import time
 import numpy as np
+from global_static_vars import default_speed
 
 motorConfig = './nico_humanoid_upper_rh7d_ukba.json'
 robot = Motion(motorConfig=motorConfig)
@@ -43,8 +44,6 @@ def loadAnimation(filename):
     raise(BaseException(filename+" does not exist"))
 
 def move_to_position_through_time(target_positions, duration):
-    if duration == 0:
-        return
     global robot
     # calculate current angular speed
     import copy
@@ -55,7 +54,7 @@ def move_to_position_through_time(target_positions, duration):
     speed_to_reach = {
         k: abs(
             (float(current_positions[k]) - float(target_positions[k])) / float(1260*duration)
-        )
+        ) if duration != 0 else default_speed
         for k in current_positions
     }
     for joi in target_positions:

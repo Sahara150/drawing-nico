@@ -6,13 +6,9 @@ import time
 import numpy as np
 from psychopy import event, visual, monitors, core
 from PIL import Image, ImageTk, ImageGrab
-import pandas as pd
-import os
 from datetime import datetime
-import json
-import ndjson
 from global_static_vars import draw_color, draw_size, experiment_dir, line_args, lower_edge_canvas, width_side
-from helper_functions import tr
+from helper_functions import tr, append_to_ndjson
 
 # Store the coordinates of the previous point
 prev_x = None
@@ -191,24 +187,7 @@ def quit_program():
         'strokes': strokes
     }
 
-    if os.path.isfile(strokes_file_path):
-        with open(strokes_file_path) as f:
-            data = []
-            reader = ndjson.reader(f)
-            for i in reader:
-                data.append(i)
-        data.append(strokes_data)
-
-        with open(strokes_file_path, "w") as f:
-            writer = ndjson.writer(f, ensure_ascii=False)
-            for d in data:
-                writer.writerow(d)
-
-    else:
-        open(strokes_file_path, "x")
-        with open(strokes_file_path, "w") as file:
-            json.dump(strokes_data, file)
-
+    append_to_ndjson(strokes_file_path, strokes_data)
     root.destroy()
 
     
