@@ -1,9 +1,7 @@
 import tkinter as tk
 from global_static_vars import draw_color, draw_size
 from PIL import ImageGrab
-from global_static_vars import width_side, height_side, images_dir
-import os
-from datetime import datetime
+from global_static_vars import width_side, height_side, line_args
 
 ######### CANVAS HELPERS ###########
 prev_x = None
@@ -62,6 +60,7 @@ def on_mouse_release(event):
     # there may be unintentional stroke interruptions and that way the error function
     # still knows which stroke it belongs to
     # Just setting last coordinate to none, so that new stroke begins
+    print("Mouse release")
     strokes.append([x, y, stroke_count])
 
     x = []
@@ -70,9 +69,13 @@ def on_mouse_release(event):
     prev_x = None
     prev_y = None
 
+def on_mouse_down(event):
+    global prev_x, prev_y
+    prev_x = event.x
+    prev_y = event.y
+
 def on_mouse_move(event):
     global prev_x, prev_y
-
     c_x = event.x
     c_y = event.y
 
@@ -90,6 +93,9 @@ def open_canvas_for_robot(data : list[list[list[int]]]):
     global canvas, root
     (root, canvas) = setup_UI()
     draw_template(data, canvas)
+    
+    canvas.bind('<ButtonPress-1>', on_mouse_down)
+
     # Bind the mouse movement event to the canvas
     canvas.bind('<B1-Motion>', on_mouse_move)
 
@@ -100,13 +106,8 @@ def open_canvas_for_robot(data : list[list[list[int]]]):
     root.mainloop()
 
 def close_canvas():
-    now = datetime.now()
-    date_hour = now.strftime("_%d-%m-%Y_%H-%M-%S")
-    participant_dir = "nicorepeats" + str(date_hour)
-    path_folder_participant = images_dir + participant_dir
-    os.mkdir(path_folder_participant)
 
-    ImageGrab.grab().crop((0, 0, width_side, height_side)).save(images_dir + participant_dir + "/" + "drawing.png")
+    ImageGrab.grab().crop((0, 0, width_side, height_side)).save(line_args['path_folder_participant'] + "/" + "drawing_robot.png")
 
     root.event_generate("<<close_canvas>>", when="tail", state=123) # trigger event in main thread
 

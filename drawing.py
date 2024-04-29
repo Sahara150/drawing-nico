@@ -184,12 +184,13 @@ def quit_program():
         'word': category,
         'condition': condition,
         'latency': latency,
+        'total_drawing_time': total_drawing_time,
+        'stroke_count': stroke_count,
         'country': line_args['country'],
         'timestamp': timestamp,
         'strokes': strokes
     }
 
-    # This is super ugly, use dependency for that
     if os.path.isfile(strokes_file_path):
         with open(strokes_file_path) as f:
             data = []

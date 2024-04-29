@@ -2,8 +2,10 @@ import pandas as pd
 from global_static_vars import experiment_dir
 import numpy
 from rdp import rdp
-from global_static_vars import draw_color, draw_size, line_args, lower_edge_canvas, width_side
+from global_static_vars import line_args, lower_edge_canvas, width_side
 from global_static_vars import max_rescale, drawing_area_x, drawing_area_y, center_y, center_x
+from canvas_functions import stroke_count
+from shapely.geometry import LineString, Point
 
 def read_newest_results(category : set):
     path_results = experiment_dir + f"raw_{category}.ndjson"
@@ -83,7 +85,7 @@ def rescale_and_shift_image(data: list[list[list[int]]]):
     shift_y = center_y - curr_center_y
     shift_x = center_x - curr_center_x
 
-    return map(lambda stroke: shift_data(stroke, shift_x, shift_y), rescaled_data)
+    return (map(lambda stroke: shift_data(stroke, shift_x, shift_y), rescaled_data), rescale_factor)
 
 #If getY is set to true, it returns y, otherwise x
 def get_max_for_stroke(item: list[list[int]], getY : bool):
@@ -98,3 +100,22 @@ def rescale_coordinates(item: list[list[int]], rescale_factor: float):
 def shift_data(item: list[list[int]], shift_x: float, shift_y: float):
     return list(map(lambda coordinate: [coordinate[0] + shift_x, coordinate[1] + shift_y], item))
     
+def calculate_error(strokes_should : list[list[list[int]]], strokes_act):
+    distance_sums = numpy.zeros(stroke_count)
+    amount_of_points = numpy.zeros(stroke_count)    
+    for stroke in strokes_act:
+        # Stroke at index 2 contains stroke count
+        stroke_should = strokes_should[stroke[2]]
+        line = LineString(stroke_should)
+        distance_sum = 0
+        for index, x in enumerate(stroke[0]):
+            p = Point(x, stroke[1, index])
+            distance = p.distance(line)
+            distance_sum += distance
+
+        distance_sums[stroke[2]] += distance_sum
+        amount_of_points[stroke[2]] += len(stroke[0])
+
+    distances = distance_sums/amount_of_points
+    print(f"Distances: {distances}")
+    return distances.sum()

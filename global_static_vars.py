@@ -39,5 +39,7 @@ parking_time = 1.500
 ### These variables are set as arguments when executing in command line, 
 ### so they may differ from initial config
 line_args = {
-    'country': "en"
+    'country': "en",
+    'participant': "nicodraws",
+    'path_folder_participant': "empty"
 }

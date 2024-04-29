@@ -105,7 +105,7 @@ def get_poses_and_durations_right(rescaled_angles_right : list[list[float]]):
         poses_right.append(rescaled_angles_right[-1])
         poses_right.append([(angle if index != 5 else -180.0) for index, angle in enumerate(rescaled_angles_right[-1])])
         durations_right += [
-            0.45
+            0.25
         ]
         
         # TODO: Test if shoulder joint is most sensible predictor of needed time or 
@@ -113,7 +113,7 @@ def get_poses_and_durations_right(rescaled_angles_right : list[list[float]]):
         durations_right += [ duration_movement(angles, rescaled_angles_right[index-1]) for index, angles in enumerate(rescaled_angles_right[1:])]
         durations_right += [
             0.75,
-            0.45
+            0.25
         ]
 
     return (poses_right, durations_right)
@@ -143,7 +143,7 @@ def get_poses_and_durations_left(rescaled_angles_left : list[list[float]], poses
             (ready_position[-1]-parking_position[-1])/1000.0,
             (steady_position[-1]-ready_position[-1])/1000.0,
             touch_timestamp/1000.0,
-            0.45
+            0.25
         ]
 
         durations_left += [ duration_movement(angles, rescaled_angles_left[index-1]) for index, angles in enumerate(rescaled_angles_left[1:])]
