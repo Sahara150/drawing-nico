@@ -8,7 +8,7 @@ from psychopy import event, visual, monitors, core
 from PIL import Image, ImageTk, ImageGrab
 from datetime import datetime
 from global_static_vars import draw_color, draw_size, experiment_dir, line_args, lower_edge_canvas, width_side
-from helper_functions import tr
+from texts import tr
 from file_helper import append_to_ndjson
 
 # Store the coordinates of the previous point

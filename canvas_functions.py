@@ -3,12 +3,16 @@ from global_static_vars import draw_color, draw_size
 from PIL import ImageGrab
 from global_static_vars import width_side, height_side, line_args, experiment_dir
 from file_helper import append_to_ndjson
+from psychopy import event, visual, monitors
+from texts import clickToContinue
 
+global win
 ######### CANVAS HELPERS ###########
 prev_x = None
 prev_y = None
 canvas = None
 root = None
+category = None
 x = []
 y = []
 strokes = []
@@ -94,9 +98,10 @@ def on_mouse_move(event):
     prev_x = c_x
     prev_y = c_y
 
-def open_canvas_for_robot(data : list[list[list[int]]]):
-    global canvas, root
-    
+def open_canvas_for_robot(data : list[list[list[int]]], _category : str):
+    global canvas, root, category
+
+    category = _category
     #Reset variables so it deletes data of last drawing
     reset_variables()
 
@@ -115,8 +120,7 @@ def open_canvas_for_robot(data : list[list[list[int]]]):
     root.mainloop()
 
 def close_canvas():
-
-    ImageGrab.grab().crop((0, 0, width_side, height_side)).save(line_args['path_folder_participant'] + "/" + "drawing_robot.png")
+    ImageGrab.grab().crop((0, 0, width_side, height_side)).save(line_args['path_folder_participant'] + "/" + category + "_drawing_robot.png")
     strokes_file_path = experiment_dir + "raw_robot_result.ndjson"
     
     stroke_data = {
@@ -146,3 +150,71 @@ def reset_variables():
     y = []
     strokes = []
     stroke_count = 0
+
+### Visual PY functions ###
+
+def configure():
+    global win, myMouse
+    monitorWidth = 47.7
+    # monitorWidth = 30.9
+    viewdist = 25.4
+    monitorname = 'testMonitor'
+    scrn = 1
+
+    mon = monitors.Monitor(monitorname, width=monitorWidth, distance=viewdist)
+    mon.setSizePix((width_side, height_side))
+
+    win = visual.Window(
+        monitor=mon,
+        size=(width_side, height_side),
+        color=(-0.4, -0.4, 1),
+        colorSpace='rgb',
+        units='deg',
+        screen=scrn,
+        allowGUI=True,
+        fullscr=True
+    )
+
+    myMouse = event.Mouse(win)
+    # myMouse.setPos(newPos=(300, 300))
+
+    return
+
+def ask_question(question : str, image_path : str):
+    text = visual.TextStim(win, text= question, color=(1, 1, 1), font='Helvetica', 
+                           pos=(0.0, 15.0), colorSpace='rgb', bold=False, height=2.5, anchorHoriz="center", wrapWidth=400)
+    text.draw()
+
+    image = visual.ImageStim(win, image=image_path, size=(600, 337),
+                             units='pix', pos=(0.0, -5.0))
+    image.draw()
+
+    button_continue = visual.ButtonStim(win, text=clickToContinue(), color=[1, 1, 1], colorSpace='rgb',
+                                        fillColor=[-0.3, -0.3, -0.3], pos=[0, -450], size=(400, 150), units='pix')
+
+    slider = visual.Slider(win, ticks=(0, 7), labels=(0, 7), granularity=0.1, pos=(0, -250), size=(1000, 50), font='Helvetica',
+                           units='pix')
+
+    slider.setMarkerPos(200)
+    slider.getMouseResponses()
+    slider.setReadOnly(False, log=None)
+    slider.draw()
+    win.flip()
+
+    touch = False
+    rating = None
+    print(slider.markerPos)
+
+    while touch == False:
+        if slider.getMouseResponses():
+            rating = slider.getRating()
+            slider.setMarkerPos(rating)
+            button_continue.draw()
+            text.draw()
+            image.draw()
+            slider.draw()
+            win.flip()
+
+        if myMouse.isPressedIn(button_continue) and rating != None:
+            touch = True
+            return rating

@@ -1,17 +1,8 @@
 import numpy
 from rdp import rdp
-from global_static_vars import line_args, lower_edge_canvas, width_side
+from global_static_vars import lower_edge_canvas, width_side
 from global_static_vars import max_rescale, drawing_area_x, drawing_area_y, center_y, center_x
-from canvas_functions import stroke_count
 from shapely.geometry import LineString, Point
-
-
-def tr(a,b):
-    country = line_args['country']
-    if country == 'SK' or country == 'sk':
-        return b
-    else:
-        return a
 
 ### Coordinate manipulations ###    
 def flatten_data(data: list[list[list[int]]]):

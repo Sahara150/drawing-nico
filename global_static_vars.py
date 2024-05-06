@@ -46,3 +46,4 @@ line_args = {
 
 categories_no_imitation = ["leaf", "spider", "pizza", "palm tree", "sheep"]
 categories_imitation = ["flower", "light bulb", "cake", "face", "bee"]
+categories_sk_imitation = ["flower", "light bulb", "cake", "face", "bee"]

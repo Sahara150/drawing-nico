@@ -3,11 +3,13 @@ import os
 from datetime import datetime
 import time
 import threading
-from global_static_vars import images_dir, experiment_dir, line_args, categories_no_imitation, categories_imitation
+from global_static_vars import images_dir, experiment_dir, line_args
+from global_static_vars import categories_no_imitation, categories_imitation, categories_sk_imitation
 from helper_functions import flatten_data, transform_coordinates, rescale_and_shift_image, calculate_error
 from file_helper import read_newest_results, append_to_ndjson
-from canvas_functions import create_canvas_with_data_from_strokes, create_canvas_with_flattened_data, open_canvas_for_robot, strokes
+from canvas_functions import create_canvas_with_data_from_strokes, create_canvas_with_flattened_data, open_canvas_for_robot, strokes, ask_question
 from robot_setup import load_robot, look_down, robot_draws_strokes
+from texts import tr, rating_scale_text
 #from nntest import compare_old_to_new
 
 def setup_for_participant():
@@ -32,16 +34,18 @@ def user_draws():
         open_canvas(f"robot_repeats_{i}", line_args['path_folder_participant'], "robot")
 
 def draw_without_imitation():
-    for category in categories_no_imitation:
-        # TODO Show category
+    for index, category in enumerate(categories_no_imitation):
+        category_text = categories_sk_imitation[index] if line_args['country'] == "sk" else category
+        show_category_prompt(category_text)
         look_down(robot)
         open_canvas(category, line_args['path_folder_participant'], "no_robot")
-        ask_questions(category)
+        ask_questions(category_text, category)
 
 def draw_with_imitation():
-    for category in categories_imitation:
+    for index, category in enumerate(categories_imitation):
         for i in range(0,2):
-            # TODO Show category
+            category_text = categories_sk_imitation[index] if line_args['country'] == "sk" else category
+            show_category_prompt(category_text)
             look_down(robot)
             open_canvas(category, line_args['path_folder_participant'], "robot")
         
@@ -53,10 +57,11 @@ def draw_with_imitation():
             rescaled_data = list(rescaled_data)
             drawing_robot_thread = threading.Thread(target = robot_draws_strokes, args = (rescaled_data,))
             drawing_robot_thread.start()
-            open_canvas_for_robot(rescaled_data)
+            open_canvas_for_robot(rescaled_data, category)
             print("Calculating error now")
             error = calculate_error(rescaled_data, strokes)
             drawing_data = {
+                'participant': line_args['participant'],
                 'trial': i,
                 'rescale_factor': rescale_factor,
                 'shift_x': shift_x,
@@ -66,12 +71,23 @@ def draw_with_imitation():
             }
             strokes_file_path = experiment_dir + "raw_" + category + "_robot.ndjson"
             append_to_ndjson(strokes_file_path, drawing_data)
-            ask_questions(category, True)
+            ask_questions(category_text, category, True)
+       
+def ask_questions(category : str, category_en : str, robot_imitated : bool = False):
+    text_self = tr("How much do you like your drawing of the ","Ako veľmi sa Vám páči Váš výkres: ") + category + "? \n"
+    text_self.append(rating_scale_text())
+    image_path_self = line_args['path_folder_participant'] + "/" + category_en + ".png"
+    rating_self = ask_question(text_self, image_path_self)
+    if robot_imitated:
+        text_robot = tr("How much do you like the robots drawing of the ", "Ako veľmi sa vám páči kresba robotov s: " + category + "? \n")
+        text_robot.append(rating_scale_text())
+        image_path_robot = line_args['path_folder_participant'] + "/" + category + "_drawing_robot.png"
+        rating_robot = ask_question(text_robot, image_path_robot)
+        return (rating_self, rating_robot)
+    else:
+        return (rating_self, None)
 
-# This should probably be changed to a function that takes a list of questions with the keys under
-# which their results get saved (dictionary), their limits and step size and iterates over them and 
-# saves the results            
-def ask_questions(category : str, robot_imitated : bool = False):
+def show_category_prompt(category : str):
     pass
 
 #line_args['country'] = "sk"
