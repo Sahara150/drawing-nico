@@ -165,7 +165,6 @@ def quit_program():
     ImageGrab.grab().crop((65, 65, width_side, lower_edge_canvas)).save(participant + "/" + category + ".png")
 
     if temp > 0:
-        #BUG: Pretty sure this is broken: Fix.
         temp2 = time.time() - margin
         total_drawing_time = temp + temp2
     else:
