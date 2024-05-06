@@ -4,7 +4,8 @@ from PIL import ImageGrab
 from global_static_vars import width_side, height_side, line_args, experiment_dir
 from file_helper import append_to_ndjson
 from psychopy import event, visual, monitors
-from texts import clickToContinue
+from texts import clickToContinue, tr
+import time
 
 global win
 ######### CANVAS HELPERS ###########
@@ -153,7 +154,7 @@ def reset_variables():
 
 ### Visual PY functions ###
 
-def configure():
+def configure_and_show():
     global win, myMouse
     monitorWidth = 47.7
     # monitorWidth = 30.9
@@ -181,6 +182,7 @@ def configure():
     return
 
 def ask_question(question : str, image_path : str):
+    configure_and_show()
     text = visual.TextStim(win, text= question, color=(1, 1, 1), font='Helvetica', 
                            pos=(0.0, 15.0), colorSpace='rgb', bold=False, height=2.5, anchorHoriz="center", wrapWidth=400)
     text.draw()
@@ -218,3 +220,41 @@ def ask_question(question : str, image_path : str):
         if myMouse.isPressedIn(button_continue) and rating != None:
             touch = True
             return rating
+        
+def show_category_prompt(category : str):
+
+    time.sleep(1.5)
+
+    text = visual.TextStim(win, text=tr("Are you ready to draw?","Ste pripravení začať kresliť?"), color=(1, 1, 1), pos=(0.0, 11.0),
+                           colorSpace='rgb', bold=False, height=2.5, anchorHoriz="center", font='Helvetica', wrapWidth=400)
+    text.draw()
+    button = visual.ButtonStim(win, text=clickToContinue(), color=[1, 1, 1], colorSpace='rgb',
+                               fillColor=[-0.3, -0.3, -0.3], pos=[0, -250], size=(400, 150), units='pix')
+    button.draw()
+
+    win.flip()
+
+    touch = False
+
+    while touch == False:
+        if myMouse.isPressedIn(button):
+            touch = True
+
+    time.sleep(0.2)
+    buttons = myMouse.getPressed()
+    myMouse.clickReset(buttons)
+
+    text = visual.TextStim(win, text=tr("Please draw with your finger the...\n","Prosím, prstom nakreslite...\n"), color=(1, 1, 1), pos=(0.0, 11.0),
+                           colorSpace='rgb', bold=False, height=2.5, anchorHoriz="center", font='Helvetica', wrapWidth=400)
+
+    text2 = visual.TextStim(win, text=category, color=(1, -0.7, -0.7), pos=(0.0, -1.0),
+                            colorSpace='rgb', bold=True, height=4.5, anchorHoriz="center", font='Helvetica', wrapWidth=400)
+
+    text.draw()
+    text2.draw()
+
+    win.flip()
+
+    time.sleep(4)
+
+    win.close()

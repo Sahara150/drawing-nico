@@ -55,7 +55,10 @@ def wait_touch():
 
 def drawing_activity(i):
     global category, category_counter
-
+    button_continue = visual.ButtonStim(win, text="Click to continue", color=[1, 1, 1], colorSpace='rgb',
+                                        fillColor=[-0.3, -0.3, -0.3],
+                                        pos=[0, -350], size=(400, 150), units='pix')
+    
     win.close()
     print("window closed, ready to open drawing")
     print(f"{category}{category_counter}")

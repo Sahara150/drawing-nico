@@ -177,6 +177,7 @@ def quit_program():
     timestamp = str(datetime.fromtimestamp(time.time()))
 
     strokes_data = {
+        'participant': participant,
         'word': category,
         'condition': condition,
         'latency': latency,

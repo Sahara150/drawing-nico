@@ -45,5 +45,10 @@ line_args = {
 }
 
 categories_no_imitation = ["leaf", "spider", "pizza", "palm tree", "sheep"]
-categories_imitation = ["flower", "light bulb", "cake", "face", "bee"]
-categories_sk_imitation = ["flower", "light bulb", "cake", "face", "bee"]
+categories_sk_no_imitation = ["list", "pavúk", "pizza", "palma", "ovca"]
+categories_fixed_imitation = ["square", "triangle"]
+categories_fixed_imitation_sk = ["štvorec", "trojuholník"]
+categories_imitation_mixed = ["light bulb", "cake", "face", "bee"]
+categories_sk_imitation_mixed = ["žiarovka", "koláč", "tvár", "včela"]
+category_imitation_last = "flower"
+category_sk_imitation_last = "kvetina"

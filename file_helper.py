@@ -7,6 +7,7 @@ from global_static_vars import experiment_dir
 
 ### File helpers ###
 def read_newest_results(category : set):
+    # TODO If tulip, get preset results??
     path_results = experiment_dir + f"raw_{category}.ndjson"
     file = pd.read_json(path_results, lines=True)
     # This gets the detailed strokes for each iteration of category

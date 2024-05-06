@@ -106,7 +106,7 @@ def get_poses_and_durations_right(rescaled_angles_right : list[list[float]]):
         poses_right.append([(angle if index != 5 else -180.0) for index, angle in enumerate(rescaled_angles_right[-1])])
         durations_right += [
             0.25,
-            0.25
+            max(min(abs(rescaled_angles_right[1][0] - rescaled_angles_right[0][0])*0.1 + abs(rescaled_angles_right[1][1] - rescaled_angles_right[0][1]) * 0.1, 0.25), 0.05)
         ]
         
         # TODO: Test if shoulder joint is most sensible predictor of needed time or 
@@ -145,7 +145,7 @@ def get_poses_and_durations_left(rescaled_angles_left : list[list[float]], poses
             (steady_position[-1]-ready_position[-1])/1000.0,
             touch_timestamp/1000.0,
             0.25,
-            0.25
+            max(min(abs(rescaled_angles_left[1][0] - rescaled_angles_left[0][0])*0.1 + abs(rescaled_angles_left[1][1] - rescaled_angles_left[0][1]) * 0.1, 0.25), 0.05)
         ]
 
         durations_left += [ duration_movement(angles, rescaled_angles_left[index-1]) for index, angles in enumerate(rescaled_angles_left[2:])]
@@ -191,4 +191,4 @@ def limit_index_finger(output: list[float]):
     return output
 
 def duration_movement(angles_curr : list[float], angles_old : list[float]):
-    return max(abs(angles_curr[0] - angles_old[0])*0.2 + abs(angles_curr[1] - angles_old[1]) * 0.2, 0.05)
+    return max(abs(angles_curr[0] - angles_old[0])*0.1 + abs(angles_curr[1] - angles_old[1]) * 0.1, 0.05)
