@@ -1,7 +1,8 @@
 import tkinter as tk
 from global_static_vars import draw_color, draw_size
 from PIL import ImageGrab
-from global_static_vars import width_side, height_side, line_args
+from global_static_vars import width_side, height_side, line_args, experiment_dir
+from file_helper import append_to_ndjson
 
 ######### CANVAS HELPERS ###########
 prev_x = None
@@ -20,11 +21,14 @@ def increase_stroke_count():
 
 def create_canvas_with_data_from_strokes(data : list[list[list[int]]]):
     (root, canvas) = setup_UI()
+    colors = ["black", "red", "green", "yellow", "blue"]
+    index = 0
     for stroke in data:
+        index += 1
         for i in range(1, len(stroke[0])): 
-            #canvas.create_line(stroke[0][i-1], stroke[1][i-1], stroke[0][i], stroke[1][i], fill=draw_color, width=draw_size)
+            canvas.create_line(stroke[0][i-1], stroke[1][i-1], stroke[0][i], stroke[1][i], fill=colors[index%5], width=draw_size)
             #HOME SOLUTION: multiplies the pixels by 0.71 due to smaller screen
-            canvas.create_line(stroke[0][i-1]*0.71, stroke[1][i-1]*0.71, stroke[0][i]*0.71, stroke[1][i]*0.71, fill=draw_color, width=draw_size)
+            #canvas.create_line(stroke[0][i-1]*0.71, stroke[1][i-1]*0.71, stroke[0][i]*0.71, stroke[1][i]*0.71, fill=colors[index%5], width=draw_size)
     root.mainloop()        
 
 def create_canvas_with_flattened_data(data : list[list[list[int]]]):
@@ -70,6 +74,7 @@ def on_mouse_release(event):
     prev_y = None
 
 def on_mouse_down(event):
+    print("Mouse down")
     global prev_x, prev_y
     prev_x = event.x
     prev_y = event.y
@@ -91,6 +96,10 @@ def on_mouse_move(event):
 
 def open_canvas_for_robot(data : list[list[list[int]]]):
     global canvas, root
+    
+    #Reset variables so it deletes data of last drawing
+    reset_variables()
+
     (root, canvas) = setup_UI()
     draw_template(data, canvas)
     
@@ -108,7 +117,12 @@ def open_canvas_for_robot(data : list[list[list[int]]]):
 def close_canvas():
 
     ImageGrab.grab().crop((0, 0, width_side, height_side)).save(line_args['path_folder_participant'] + "/" + "drawing_robot.png")
-
+    strokes_file_path = experiment_dir + "raw_robot_result.ndjson"
+    
+    stroke_data = {
+        "strokes": strokes
+    }
+    append_to_ndjson(strokes_file_path, stroke_data)
     root.event_generate("<<close_canvas>>", when="tail", state=123) # trigger event in main thread
 
 def close_canvas_event(evt):        
@@ -118,5 +132,17 @@ def draw_template(data : list[list[list[int]]], canvas):
     for stroke in data:
         for i in range(1, len(stroke)):
             canvas.create_line(stroke[i-1][0], stroke[i-1][1], stroke[i][0], stroke[i][1], fill='red', width=draw_size)
+            canvas.create_oval(stroke[i][0], stroke[i][1], stroke[i][0]+ 3, stroke[i][1] + 3)
             #HOME SOLUTION: multiplies the pixels by 0.71 due to smaller screen
             #canvas.create_line(stroke[i-1][0]*0.71, stroke[i-1][1]*0.71, stroke[i][0]*0.71, stroke[i][1]*0.71, fill='red', width=draw_size)
+
+def reset_variables():
+    global prev_x, prev_y, canvas, root, x, y, strokes, stroke_count
+    prev_x = None
+    prev_y = None
+    canvas = None
+    root = None
+    x = []
+    y = []
+    strokes = []
+    stroke_count = 0

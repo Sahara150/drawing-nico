@@ -99,18 +99,19 @@ def get_poses_and_durations_right(rescaled_angles_right : list[list[float]]):
         # TODO: Check, if left arm is already in parking position, to save time if it is
         move_to_position_through_time_ext(leftArmDofs, parking_position[:-1], parking_time)            
         rescaled_angles_right = np.array(rescaled_angles_right)
-        rescaled_angles_right[:, 1] -= 0.7
+        #rescaled_angles_right[:, 1] -= 0.7
         #poses_right.append([(angle if index != 5 else -180.0) for index, angle in enumerate(rescaled_angles_right[0])])
         poses_right += list(rescaled_angles_right)
         poses_right.append(rescaled_angles_right[-1])
         poses_right.append([(angle if index != 5 else -180.0) for index, angle in enumerate(rescaled_angles_right[-1])])
         durations_right += [
+            0.25,
             0.25
         ]
         
         # TODO: Test if shoulder joint is most sensible predictor of needed time or 
         # what would be better time calculation
-        durations_right += [ duration_movement(angles, rescaled_angles_right[index-1]) for index, angles in enumerate(rescaled_angles_right[1:])]
+        durations_right += [ duration_movement(angles, rescaled_angles_right[index-1]) for index, angles in enumerate(rescaled_angles_right[2:])]
         durations_right += [
             0.75,
             0.25
@@ -143,10 +144,11 @@ def get_poses_and_durations_left(rescaled_angles_left : list[list[float]], poses
             (ready_position[-1]-parking_position[-1])/1000.0,
             (steady_position[-1]-ready_position[-1])/1000.0,
             touch_timestamp/1000.0,
+            0.25,
             0.25
         ]
 
-        durations_left += [ duration_movement(angles, rescaled_angles_left[index-1]) for index, angles in enumerate(rescaled_angles_left[1:])]
+        durations_left += [ duration_movement(angles, rescaled_angles_left[index-1]) for index, angles in enumerate(rescaled_angles_left[2:])]
 
         durations_left += [
             (steady_position[-1]-ready_position[-1])/1000.0,
@@ -189,4 +191,4 @@ def limit_index_finger(output: list[float]):
     return output
 
 def duration_movement(angles_curr : list[float], angles_old : list[float]):
-    return abs(angles_curr[0] - angles_old[0])*0.2 + abs(angles_curr[1] - angles_old[1]) * 0.2
+    return max(abs(angles_curr[0] - angles_old[0])*0.2 + abs(angles_curr[1] - angles_old[1]) * 0.2, 0.05)

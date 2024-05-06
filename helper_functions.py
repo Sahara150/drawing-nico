@@ -1,43 +1,10 @@
-import pandas as pd
-from global_static_vars import experiment_dir
 import numpy
 from rdp import rdp
 from global_static_vars import line_args, lower_edge_canvas, width_side
 from global_static_vars import max_rescale, drawing_area_x, drawing_area_y, center_y, center_x
 from canvas_functions import stroke_count
 from shapely.geometry import LineString, Point
-import os
-import ndjson
 
-def read_newest_results(category : set):
-    path_results = experiment_dir + f"raw_{category}.ndjson"
-    file = pd.read_json(path_results, lines=True)
-    # This gets the detailed strokes for each iteration of category
-    strokes = file["strokes"]
-    data = strokes[len(strokes)-1]
-    return data
-
-def read_results(category : str, iteration : int):
-    path_results = experiment_dir + f"raw_{category}.ndjson"
-    file = pd.read_json(path_results, lines=True)
-    # This gets the detailed strokes for each iteration of category
-    strokes = file["strokes"]
-    data = strokes[iteration]
-    return data
-
-def append_to_ndjson(file_path, new_data):
-    # Read existing data if file exists, otherwise start with an empty list
-    data = []
-    if os.path.isfile(file_path):
-        with open(file_path, 'r') as file:
-            data = ndjson.load(file)
-
-    # Append the new data
-    data.append(new_data)
-
-    # Write all data back to the file
-    with open(file_path, 'w') as file:
-        ndjson.dump(data, file)
 
 def tr(a,b):
     country = line_args['country']
@@ -45,7 +12,8 @@ def tr(a,b):
         return b
     else:
         return a
-    
+
+### Coordinate manipulations ###    
 def flatten_data(data: list[list[list[int]]]):
     flattened_strokes = []
     for stroke in data:
@@ -62,10 +30,7 @@ def flatten_data(data: list[list[list[int]]]):
     return flattened_strokes
 
 # This function takes the flattened data and mirrors the y values by calculating "lower edge of canvas"-y as new y
-# x stays untouched when the robot shall draw, as we just invert the axis, so that (0|0) 
-# is at the lower left of robot
-# If the image gets turned around later to calculate the error, x gets mirrored too (can be specified with
-# transform_x)
+# x stays untouched if transform_x is false
 def transform_coordinates(data: list[list[list[int]]], transform_x : bool = False):
     # Converting to list, so it can be used multiple times in rescale_and_shift function
     return list(map(lambda stroke: list(map(lambda coordinate: transform_coordinate(coordinate, transform_x), stroke)), data))
@@ -101,7 +66,7 @@ def rescale_and_shift_image(data: list[list[list[int]]]):
     shift_y = center_y - curr_center_y
     shift_x = center_x - curr_center_x
 
-    return (map(lambda stroke: shift_data(stroke, shift_x, shift_y), rescaled_data), rescale_factor)
+    return (map(lambda stroke: shift_data(stroke, shift_x, shift_y), rescaled_data), rescale_factor, shift_x, shift_y)
 
 #If getY is set to true, it returns y, otherwise x
 def get_max_for_stroke(item: list[list[int]], getY : bool):
@@ -117,21 +82,23 @@ def shift_data(item: list[list[int]], shift_x: float, shift_y: float):
     return list(map(lambda coordinate: [coordinate[0] + shift_x, coordinate[1] + shift_y], item))
     
 def calculate_error(strokes_should : list[list[list[int]]], strokes_act):
-    distance_sums = numpy.zeros(stroke_count)
-    amount_of_points = numpy.zeros(stroke_count)    
+    distance_sums = numpy.zeros(len(strokes_should))
+    amount_of_points = numpy.zeros(len(strokes_should))    
     for stroke in strokes_act:
-        # Stroke at index 2 contains stroke count
-        stroke_should = strokes_should[stroke[2]]
-        line = LineString(stroke_should)
-        distance_sum = 0
-        for index, x in enumerate(stroke[0]):
-            p = Point(x, stroke[1, index])
-            distance = p.distance(line)
-            distance_sum += distance
+        if len(stroke[0])!=0:
+            # Stroke at index 2 contains stroke count
+            stroke_should = strokes_should[stroke[2]]
+            line = LineString(stroke_should)
+            distance_sum = 0
+            for index, x in enumerate(stroke[0]):
+                p = Point(x, stroke[1][index])
+                distance = p.distance(line)
+                distance_sum += abs(distance)
 
-        distance_sums[stroke[2]] += distance_sum
-        amount_of_points[stroke[2]] += len(stroke[0])
+            distance_sums[stroke[2]] += distance_sum
+            amount_of_points[stroke[2]] += len(stroke[0])
 
-    distances = distance_sums/amount_of_points
+    print(f"Distance sums: {distance_sums}, Amount of points: {amount_of_points}")
+    distances = numpy.divide(distance_sums, amount_of_points, where=amount_of_points!=0)
     print(f"Distances: {distances}")
-    return distances.sum()
+    return distances.sum()/len(distances)
