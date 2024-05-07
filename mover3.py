@@ -63,8 +63,6 @@ def move_to_position_through_time(target_positions, duration):
             float(target_positions[joi]),
             speed_to_reach[joi],
         )
-    print(f"Load Shoulder: {robot._robot.r_shoulder_y.present_load}")
-    print(f"Load elbow: {robot._robot.r_elbow_y.present_load}" )
 
 # Instead of a dictionary, this function requires only a list of positions and the corresponding 
 # dofs

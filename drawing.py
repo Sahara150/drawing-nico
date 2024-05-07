@@ -32,6 +32,7 @@ margin = 0.0
 
 def open_canvas(_category : str, _participant : str, _condition : str):
     global category, participant, condition, start, strokes_file_path, root, canvas
+    reset_variables()
     category = _category
     participant = _participant
     condition = _condition
@@ -49,6 +50,27 @@ def open_canvas(_category : str, _participant : str, _condition : str):
     # Start the main Tkinter event loop
     root.mainloop()
 
+def reset_variables():
+    global prev_x, prev_y, start_drawing_time, stroke_count, do_one_time, total_drawing_time, latency, temp, margin
+    # Store the coordinates of the previous point
+    prev_x = None
+    prev_y = None
+    start_drawing_time = 0.0
+
+    x.clear()
+    y.clear()
+    t.clear()
+    strokes.clear()
+
+    # Keep track of the number of strokes
+    stroke_count = 0
+
+    do_one_time = True
+    total_drawing_time = 0.0
+    latency = 0.0
+    temp = 0.0
+    margin = 0.0
+    
 def setup_UI() -> "tuple[object, object]":
 
     # Initialize Tkinter

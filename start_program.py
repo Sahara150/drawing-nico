@@ -11,7 +11,7 @@ from helper_functions import flatten_data, transform_coordinates, rescale_and_sh
 from file_helper import read_newest_results, append_to_ndjson
 from canvas_functions import create_canvas_with_data_from_strokes, create_canvas_with_flattened_data, open_canvas_for_robot, strokes
 from canvas_functions import ask_question, configure_and_show, show_category_prompt
-from robot_setup import load_robot, look_down, robot_draws_strokes
+from robot_setup import load_robot, look_down, robot_draws_strokes, look_to_side
 from texts import tr, rating_scale_text
 import random
 import sys
@@ -51,14 +51,17 @@ def draw_without_imitation():
 
     drawing_data = {
         'condition' : "no_repeat",
-        'ratings' : list(ratings)
+        'ratings' : list(ratings),
+        'order': seq
     }
     strokes_file_path = line_args['path_folder_participant'] + "/ratings_no_repeat.ndjson"
     append_to_ndjson(strokes_file_path, drawing_data)  
 
 def draw_with_imitation():
     configure_and_show()
-    ratings = np.zeros(7)
+    ratings = [
+        [], [], [], [], [], [], []
+    ]
     for index, category in enumerate(categories_fixed_imitation):
         category_text = categories_fixed_imitation_sk[index] if line_args['country'] == "sk" else category
         rating = drawing_activity(category, category_text, True)
@@ -80,16 +83,16 @@ def draw_with_imitation():
         'ratings_robot_1' : list(ratings[:][0][1]),
         'ratings_self_2': list(ratings[:][1][0]),
         'ratings_robot_2' : list(ratings[:][1][1]),
+        'order' : seq
     }
     strokes_file_path = line_args['path_folder_participant'] + "/ratings_repeat.ndjson"
     append_to_ndjson(strokes_file_path, drawing_data)
 
 def drawing_activity(category : str, category_text: str, robot_active : bool = False):
-    # TODO: We need to tell user that he draws it again for the robot, and it will repeat again
     repetitions = 2 if robot_active else 1
     ratings = []
     for i in range(0,repetitions):
-        show_category_prompt(category_text)
+        show_category_prompt(category_text, second_time = True if i == 1 else False)
         look_down(robot)
         open_canvas(category, line_args['path_folder_participant'], "second" if i == 2 else "first")
 
@@ -103,7 +106,7 @@ def drawing_activity(category : str, category_text: str, robot_active : bool = F
             drawing_robot_thread = threading.Thread(target = robot_draws_strokes, args = (rescaled_data,))
             drawing_robot_thread.start()
             open_canvas_for_robot(rescaled_data, category)
-            print("Calculating error now")
+            
             error = calculate_error(rescaled_data, strokes)
             drawing_data = {
                 'participant': line_args['participant'],
@@ -116,6 +119,7 @@ def drawing_activity(category : str, category_text: str, robot_active : bool = F
             }
             strokes_file_path = experiment_dir + "raw_" + category + "_robot.ndjson"
             append_to_ndjson(strokes_file_path, drawing_data)
+        look_to_side(robot)    
         ratings.append(ask_questions(category_text, category, robot_active))
     return ratings    
 
@@ -129,13 +133,13 @@ def ask_questions(category : str, category_en : str, robot_imitated : bool = Fal
         text_robot += rating_scale_text()
         image_path_robot = line_args['path_folder_participant'] + "/" + category + "_drawing_robot.png"
         rating_robot = ask_question(text_robot, image_path_robot)
-        return (rating_self, rating_robot)
+        return [rating_self, rating_robot]
     else:
-        return (rating_self, None)
+        return [rating_self, None]
 
 line_args['participant'] = "test" #sys.argv[1]
-line_args['country'] = "sk" # sys.argv[2]
-condition = "no_repeat" # sys.argv[3]
+line_args['country'] = "en" # sys.argv[2]
+condition = "repeat" # sys.argv[3]
 
 setup_for_participant()
 robot = load_robot()
@@ -152,7 +156,7 @@ else:
 #look_down(robot)
 #user_draws()
 #data = read_newest_results("tulip")
-#data = read_newest_results("robot_results")
+#data = read_newest_results("robot_result_fixed")
 #flattened_data = flatten_data(data)
 #create_canvas_with_data_from_strokes(data)
 #create_canvas_with_flattened_data(flattened_data)

@@ -6,6 +6,7 @@ from file_helper import append_to_ndjson
 from psychopy import event, visual, monitors
 from texts import clickToContinue, tr
 import time
+from global_static_vars import monitorname, monitorWidth, viewdist, scrn
 
 global win
 ######### CANVAS HELPERS ###########
@@ -28,7 +29,8 @@ def create_canvas_with_data_from_strokes(data : list[list[list[int]]]):
     (root, canvas) = setup_UI()
     colors = ["black", "red", "green", "yellow", "blue"]
     index = 0
-    for stroke in data:
+    for stroke in data[4:10]:
+    #for stroke in data:
         index += 1
         for i in range(1, len(stroke[0])): 
             canvas.create_line(stroke[0][i-1], stroke[1][i-1], stroke[0][i], stroke[1][i], fill=colors[index%5], width=draw_size)
@@ -71,7 +73,7 @@ def on_mouse_release(event):
     # Just setting last coordinate to none, so that new stroke begins
     print("Mouse release")
     strokes.append([x, y, stroke_count])
-
+    print(f"Strokes length is {len(strokes)}")
     x = []
     y = []
     
@@ -104,6 +106,7 @@ def open_canvas_for_robot(data : list[list[list[int]]], _category : str):
 
     category = _category
     #Reset variables so it deletes data of last drawing
+    print("Reset variables")
     reset_variables()
 
     (root, canvas) = setup_UI()
@@ -113,7 +116,12 @@ def open_canvas_for_robot(data : list[list[list[int]]], _category : str):
 
     # Bind the mouse movement event to the canvas
     canvas.bind('<B1-Motion>', on_mouse_move)
+    
+    # Bind the mouse movement event to the canvas
+    canvas.bind('<B3-Motion>', on_mouse_move)
 
+    canvas.bind('<ButtonRelease-3>', on_mouse_release)
+    
     # Bind the mouse release event to the canvas
     canvas.bind('<ButtonRelease-1>', on_mouse_release)
 
@@ -122,12 +130,7 @@ def open_canvas_for_robot(data : list[list[list[int]]], _category : str):
 
 def close_canvas():
     ImageGrab.grab().crop((0, 0, width_side, height_side)).save(line_args['path_folder_participant'] + "/" + category + "_drawing_robot.png")
-    strokes_file_path = experiment_dir + "raw_robot_result.ndjson"
-    
-    stroke_data = {
-        "strokes": strokes
-    }
-    append_to_ndjson(strokes_file_path, stroke_data)
+
     root.event_generate("<<close_canvas>>", when="tail", state=123) # trigger event in main thread
 
 def close_canvas_event(evt):        
@@ -142,47 +145,45 @@ def draw_template(data : list[list[list[int]]], canvas):
             #canvas.create_line(stroke[i-1][0]*0.71, stroke[i-1][1]*0.71, stroke[i][0]*0.71, stroke[i][1]*0.71, fill='red', width=draw_size)
 
 def reset_variables():
-    global prev_x, prev_y, canvas, root, x, y, strokes, stroke_count
+    global prev_x, prev_y, canvas, root, stroke_count
     prev_x = None
     prev_y = None
     canvas = None
     root = None
-    x = []
-    y = []
-    strokes = []
+    x.clear()
+    y.clear()
+    strokes.clear()
     stroke_count = 0
 
 ### Visual PY functions ###
 
 def configure_and_show():
     global win, myMouse
-    monitorWidth = 47.7
-    # monitorWidth = 30.9
-    viewdist = 25.4
-    monitorname = 'testMonitor'
-    scrn = 1
+    try:
+        # Try to flip the window
+        win.flip()
+    except Exception as e:
+        # No window open, open window
+        mon = monitors.Monitor(monitorname, width=monitorWidth, distance=viewdist)
+        mon.setSizePix((width_side, height_side))
 
-    mon = monitors.Monitor(monitorname, width=monitorWidth, distance=viewdist)
-    mon.setSizePix((width_side, height_side))
+        win = visual.Window(
+            monitor=mon,
+            size=(width_side, height_side),
+            color=(-0.4, -0.4, 1),
+            colorSpace='rgb',
+            units='deg',
+            screen=scrn,
+            allowGUI=True,
+            fullscr=True
+        )
 
-    win = visual.Window(
-        monitor=mon,
-        size=(width_side, height_side),
-        color=(-0.4, -0.4, 1),
-        colorSpace='rgb',
-        units='deg',
-        screen=scrn,
-        allowGUI=True,
-        fullscr=True
-    )
-
-    myMouse = event.Mouse(win)
-    # myMouse.setPos(newPos=(300, 300))
-
-    return
+        myMouse = event.Mouse(win)
+        # myMouse.setPos(newPos=(300, 300))
 
 def ask_question(question : str, image_path : str):
     configure_and_show()
+        
     text = visual.TextStim(win, text= question, color=(1, 1, 1), font='Helvetica', 
                            pos=(0.0, 15.0), colorSpace='rgb', bold=False, height=2.5, anchorHoriz="center", wrapWidth=400)
     text.draw()
@@ -221,11 +222,14 @@ def ask_question(question : str, image_path : str):
             touch = True
             return rating
         
-def show_category_prompt(category : str):
+def show_category_prompt(category : str, second_time : bool = False):
 
     time.sleep(1.5)
-
-    text = visual.TextStim(win, text=tr("Are you ready to draw?","Ste pripravení začať kresliť?"), color=(1, 1, 1), pos=(0.0, 11.0),
+    if second_time:
+        textShown = tr(f"Are you ready to draw {category} for the robot a second time?", f"Ste pripravení nakresliť {category} pre robota druhýkrát?")
+    else: 
+        textShown = tr("Are you ready to draw?","Ste pripravení začať kresliť?")
+    text = visual.TextStim(win, text=textShown, color=(1, 1, 1), pos=(0.0, 11.0),
                            colorSpace='rgb', bold=False, height=2.5, anchorHoriz="center", font='Helvetica', wrapWidth=400)
     text.draw()
     button = visual.ButtonStim(win, text=clickToContinue(), color=[1, 1, 1], colorSpace='rgb',

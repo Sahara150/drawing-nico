@@ -1,14 +1,16 @@
 import os
 import ndjson
 import pandas as pd
-from global_static_vars import experiment_dir
+from global_static_vars import experiment_dir, category_imitation_last
 
 
 
 ### File helpers ###
 def read_newest_results(category : set):
-    # TODO If tulip, get preset results??
-    path_results = experiment_dir + f"raw_{category}.ndjson"
+    if category == category_imitation_last:
+        path_results = "./preset_flower.ndjson"
+    else:    
+        path_results = experiment_dir + f"raw_{category}.ndjson"
     file = pd.read_json(path_results, lines=True)
     # This gets the detailed strokes for each iteration of category
     strokes = file["strokes"]

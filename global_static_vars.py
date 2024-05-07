@@ -17,6 +17,12 @@ width_side, height_side = 1920, 1080
 #Speed of robot movements
 default_speed = 0.08
 
+# Borders of area where NN lifts hand too high and we control manually downwards
+y_upper = 135
+y_lower = 0
+x_lower = 750
+x_upper = 1030
+
 #The maximum rescale applied, so that the robot doesn't overdo the increase in size
 max_rescale = 1.5
 #The size of the drawing field the robot can use
@@ -52,3 +58,12 @@ categories_imitation_mixed = ["light bulb", "cake", "face", "bee"]
 categories_sk_imitation_mixed = ["žiarovka", "koláč", "tvár", "včela"]
 category_imitation_last = "flower"
 category_sk_imitation_last = "kvetina"
+
+
+monitorWidth = 47.7
+viewdist = 25.4
+monitorname = 'testMonitor'
+scrn = 1
+
+min_duration = 0.01
+duration_down = 0.2

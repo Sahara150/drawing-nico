@@ -1,6 +1,7 @@
 from nicomotion.Motion import Motion
 from global_static_vars import default_speed, width_side, height_side
 from global_static_vars import  ready_position, steady_position, parking_position, leftArmDofs, rightArmDofs, parking_time
+from global_static_vars import x_upper, x_lower, y_lower, y_upper, min_duration, duration_down
 from keras.models import load_model
 import keras
 import numpy as np
@@ -14,13 +15,15 @@ model = load_model("perceptron_high_data.h5", safe_mode=True, custom_objects={
 model_left = load_model("perceptron_left.h5")
 print(model.summary())
 
-#TODO: If not too much work, replace that with mover3
 def load_robot() -> Motion :
     return robot
 
 def look_down(robot : Motion):
     robot.setAngle("head_y", -40.0, default_speed)
     robot.setAngle("head_z", 0.0, default_speed)
+
+def look_to_side(robot : Motion):
+    pass
 
 def setup_robot(robot : Motion):
     robot.enableTorqueAll()
@@ -48,27 +51,29 @@ def robot_draws_strokes(strokes: list[list[list[int]]]):
     # We get each point, get the angles for it and then implement the 
     # continuous movement
     for index, stroke in enumerate(strokes):
-        (angles_right, angles_left) = get_angles_for_stroke(stroke)
-        angles_right = [limit_index_finger(output) for output in angles_right]
-        angles_left = [limit_index_finger(output) for output in angles_left]
-        rescaled_angles_right = list(np.round(np.array(angles_right)*180.0))
-        rescaled_angles_left = list(np.round(np.array(angles_left)*180.0))
+        # Only execute strokes that contain more than one coordinate
+        if len(stroke) > 1:
+            (angles_right, angles_left) = get_angles_for_stroke(stroke)
+            angles_right = [limit_index_finger(output) for output in angles_right]
+            angles_left = [limit_index_finger(output) for output in angles_left]
+            rescaled_angles_right = list(np.round(np.array(angles_right)*180.0))
+            rescaled_angles_left = list(np.round(np.array(angles_left)*180.0))
 
-        (poses_right, durations_right) = get_poses_and_durations_right(rescaled_angles_right)
-        # This will have side effects on poses_right & durations_right. We still made it a function to 
-        # improve readability in the main code
-        (poses_left, durations_left) = get_poses_and_durations_left(rescaled_angles_left, poses_right, durations_right)
-        
-        if len(rescaled_angles_right)!=0:
-            touch_timestamp = 450 + rescaled_angles_right[0][0]*250
-            move_to_position_through_time_ext(rightArmDofs, [(angle if index != 5 else -180.0) for index, angle in enumerate(rescaled_angles_right[0])], round(touch_timestamp)/1000.0)  
-            time.sleep(touch_timestamp/1000.0)
-            time.sleep(1)
-        
-        play_movement(rightArmDofs, poses_right, durations_right)
-        play_movement(leftArmDofs, poses_left, durations_left)    
-        increase_stroke_count()
-    # At end of drawing, move left arm back to parking and right arm through steady & ready
+            (poses_right, durations_right) = get_poses_and_durations_right(rescaled_angles_right)
+            # This will have side effects on poses_right & durations_right. We still made it a function to 
+            # improve readability in the main code
+            (poses_left, durations_left) = get_poses_and_durations_left(rescaled_angles_left, poses_right, durations_right)
+            
+            if len(rescaled_angles_right)!=0:
+                touch_timestamp = 450 + rescaled_angles_right[0][0]*250
+                move_to_position_through_time_ext(rightArmDofs, [(angle if index != 5 else -180.0) for index, angle in enumerate(rescaled_angles_right[0])], round(touch_timestamp)/1000.0)  
+                time.sleep(touch_timestamp/1000.0)
+                time.sleep(1)
+            
+            play_movement(rightArmDofs, poses_right, durations_right)
+            play_movement(leftArmDofs, poses_left, durations_left)    
+            increase_stroke_count()
+        # At end of drawing, move left arm back to parking and right arm through steady & ready
     # back to parking
 
     move_to_position_through_time_ext(leftArmDofs, parking_position[:-1], parking_time)  
@@ -105,13 +110,12 @@ def get_poses_and_durations_right(rescaled_angles_right : list[list[float]]):
         poses_right.append(rescaled_angles_right[-1])
         poses_right.append([(angle if index != 5 else -180.0) for index, angle in enumerate(rescaled_angles_right[-1])])
         durations_right += [
-            0.25,
-            max(min(abs(rescaled_angles_right[1][0] - rescaled_angles_right[0][0])*0.1 + abs(rescaled_angles_right[1][1] - rescaled_angles_right[0][1]) * 0.1, 0.25), 0.05)
+            duration_down
         ]
         
         # TODO: Test if shoulder joint is most sensible predictor of needed time or 
         # what would be better time calculation
-        durations_right += [ duration_movement(angles, rescaled_angles_right[index-1]) for index, angles in enumerate(rescaled_angles_right[2:])]
+        durations_right += [ duration_movement(angles, rescaled_angles_right[index-1]) for index, angles in enumerate(rescaled_angles_right[1:])]
         durations_right += [
             0.75,
             0.25
@@ -144,11 +148,10 @@ def get_poses_and_durations_left(rescaled_angles_left : list[list[float]], poses
             (ready_position[-1]-parking_position[-1])/1000.0,
             (steady_position[-1]-ready_position[-1])/1000.0,
             touch_timestamp/1000.0,
-            0.25,
-            max(min(abs(rescaled_angles_left[1][0] - rescaled_angles_left[0][0])*0.1 + abs(rescaled_angles_left[1][1] - rescaled_angles_left[0][1]) * 0.1, 0.25), 0.05)
+            duration_down
         ]
 
-        durations_left += [ duration_movement(angles, rescaled_angles_left[index-1]) for index, angles in enumerate(rescaled_angles_left[2:])]
+        durations_left += [ duration_movement(angles, rescaled_angles_left[index-1]) for index, angles in enumerate(rescaled_angles_left[1:])]
 
         durations_left += [
             (steady_position[-1]-ready_position[-1])/1000.0,
@@ -178,7 +181,14 @@ def get_angles_for_stroke(stroke : list[list[int]]):
             
 def get_output_for_point(point : list[int], left : bool = False):
     inps = np.array([point],np.float32) / np.array([width_side, height_side],np.float32)
-    return model(inps).numpy()[0] if not left else model_left(inps).numpy()[0]
+    result = model(inps).numpy()[0] if not left else model_left(inps).numpy()[0]
+    if point[0] < x_upper and point[0] > x_lower and point[1] < y_upper and point[1] > y_lower:
+        # This is the area where the arm is too high up, reduce shoulder by 0.7, so it touches tablet.
+        # 0.0039 is equivalent of 0.7/180
+        print("Hit")
+        result[1] -= 0.0039
+    return result    
+
 
 def get_index_for_first(angles_for_points: list[list[int]]):
     for index, output in enumerate(angles_for_points):
@@ -191,4 +201,4 @@ def limit_index_finger(output: list[float]):
     return output
 
 def duration_movement(angles_curr : list[float], angles_old : list[float]):
-    return max(abs(angles_curr[0] - angles_old[0])*0.1 + abs(angles_curr[1] - angles_old[1]) * 0.1, 0.05)
+    return max(abs(angles_curr[0] - angles_old[0])*0.1 + abs(angles_curr[1] - angles_old[1]) * 0.1, min_duration)
