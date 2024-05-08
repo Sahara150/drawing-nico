@@ -1,6 +1,4 @@
-﻿# THIS CODE GOT COPIED FROM PREVIOUS EXPERIMENTS AND MODIFIED
-# DO NOT GRADE, I DID NOT PRODUCE THIS CODE
-import tkinter as tk
+﻿import tkinter as tk
 import sys
 import time
 import numpy as np
@@ -10,6 +8,9 @@ from datetime import datetime
 from global_static_vars import draw_color, draw_size, experiment_dir, line_args, lower_edge_canvas, width_side
 from texts import tr
 from file_helper import append_to_ndjson
+
+# THIS CODE GOT COPIED FROM PREVIOUS EXPERIMENTS AND MODIFIED
+# DO NOT GRADE, I DID NOT PRODUCE THIS CODE
 
 # Store the coordinates of the previous point
 prev_x = None

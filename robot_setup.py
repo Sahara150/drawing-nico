@@ -18,6 +18,10 @@ print(model.summary())
 def load_robot() -> Motion :
     return robot
 
+def to_default_position(robot : Motion):
+    move_to_position_through_time_ext(rightArmDofs, parking_position, 1.5)
+    move_to_position_through_time_ext(leftArmDofs, parking_position, 1.5)
+
 def look_down(robot : Motion):
     robot.setAngle("head_y", -40.0, default_speed)
     robot.setAngle("head_z", 0.0, default_speed)
@@ -186,7 +190,8 @@ def get_output_for_point(point : list[int], left : bool = False):
         # This is the area where the arm is too high up, reduce shoulder by 0.7, so it touches tablet.
         # 0.0039 is equivalent of 0.7/180
         print("Hit")
-        result[1] -= 0.0039
+        # TODO: Test influence
+        result[3] -= 0.0039
     return result    
 
 

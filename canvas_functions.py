@@ -29,29 +29,18 @@ def create_canvas_with_data_from_strokes(data : list[list[list[int]]]):
     (root, canvas) = setup_UI()
     colors = ["black", "red", "green", "yellow", "blue"]
     index = 0
-    for stroke in data[4:10]:
-    #for stroke in data:
+    #for stroke in data[4:10]:
+    for stroke in data:
         index += 1
         for i in range(1, len(stroke[0])): 
-            canvas.create_line(stroke[0][i-1], stroke[1][i-1], stroke[0][i], stroke[1][i], fill=colors[index%5], width=draw_size)
+            #canvas.create_line(stroke[0][i-1], stroke[1][i-1], stroke[0][i], stroke[1][i], fill=colors[index%5], width=draw_size)
             #HOME SOLUTION: multiplies the pixels by 0.71 due to smaller screen
-            #canvas.create_line(stroke[0][i-1]*0.71, stroke[1][i-1]*0.71, stroke[0][i]*0.71, stroke[1][i]*0.71, fill=colors[index%5], width=draw_size)
+            canvas.create_line(stroke[0][i-1]*0.71, stroke[1][i-1]*0.71, stroke[0][i]*0.71, stroke[1][i]*0.71, fill=colors[index%5], width=draw_size)
     root.mainloop()        
 
 def create_canvas_with_flattened_data(data : list[list[list[int]]]):
     (root, canvas) = setup_UI()
     draw_template(data, canvas)
-    root.mainloop()
-
-# TODO: Old code, clean up before submission
-def create_canvas_with_data_from_detailed_strokes(data : list[list[int]]):
-    (root, canvas) = setup_UI()
-    for i in range(1, len(data)):
-        if data[i-1][2] != -1:
-            # No end of stroke before, draw connection
-            canvas.create_line(data[i-1][0], data[i-1][1], data[i][0], data[i][1], fill=draw_color, width=draw_size)
-            #HOME SOLUTION: multiplies the pixels by 0.71
-            #canvas.create_line(data[i-1][0]*0.71, data[i-1][1]*0.71, data[i][0]*0.71, data[i][1]*0.71, fill=draw_color, width=draw_size)
     root.mainloop()
 
 def setup_UI() -> "tuple[object, object]":
@@ -129,7 +118,7 @@ def open_canvas_for_robot(data : list[list[list[int]]], _category : str):
     root.mainloop()
 
 def close_canvas():
-    ImageGrab.grab().crop((0, 0, width_side, height_side)).save(line_args['path_folder_participant'] + "/" + category + "_drawing_robot.png")
+    ImageGrab.grab().crop((0, 0, width_side, height_side)).rotate(180.0).save(line_args['path_folder_participant'] + "/" + category + "_drawing_robot.png")
 
     root.event_generate("<<close_canvas>>", when="tail", state=123) # trigger event in main thread
 
@@ -155,7 +144,7 @@ def reset_variables():
     strokes.clear()
     stroke_count = 0
 
-### Visual PY functions ###
+### Visual PY functions, heavily inspired by previous experimental code ###
 
 def configure_and_show():
     global win, myMouse
@@ -229,7 +218,25 @@ def show_category_prompt(category : str, second_time : bool = False):
         textShown = tr(f"Are you ready to draw {category} for the robot a second time?", f"Ste pripravení nakresliť {category} pre robota druhýkrát?")
     else: 
         textShown = tr("Are you ready to draw?","Ste pripravení začať kresliť?")
-    text = visual.TextStim(win, text=textShown, color=(1, 1, 1), pos=(0.0, 11.0),
+    show_prompt(textShown)
+
+    text = visual.TextStim(win, text=tr("Please draw with your finger the...\n","Prosím, prstom nakreslite...\n"), color=(1, 1, 1), pos=(0.0, 11.0),
+                           colorSpace='rgb', bold=False, height=2.5, anchorHoriz="center", font='Helvetica', wrapWidth=400)
+
+    text2 = visual.TextStim(win, text=category, color=(1, -0.7, -0.7), pos=(0.0, -1.0),
+                            colorSpace='rgb', bold=True, height=4.5, anchorHoriz="center", font='Helvetica', wrapWidth=400)
+
+    text.draw()
+    text2.draw()
+
+    win.flip()
+
+    time.sleep(4)
+
+    win.close()
+
+def show_prompt(text : str):
+    text = visual.TextStim(win, text=text, color=(1, 1, 1), pos=(0.0, 11.0),
                            colorSpace='rgb', bold=False, height=2.5, anchorHoriz="center", font='Helvetica', wrapWidth=400)
     text.draw()
     button = visual.ButtonStim(win, text=clickToContinue(), color=[1, 1, 1], colorSpace='rgb',
@@ -247,18 +254,3 @@ def show_category_prompt(category : str, second_time : bool = False):
     time.sleep(0.2)
     buttons = myMouse.getPressed()
     myMouse.clickReset(buttons)
-
-    text = visual.TextStim(win, text=tr("Please draw with your finger the...\n","Prosím, prstom nakreslite...\n"), color=(1, 1, 1), pos=(0.0, 11.0),
-                           colorSpace='rgb', bold=False, height=2.5, anchorHoriz="center", font='Helvetica', wrapWidth=400)
-
-    text2 = visual.TextStim(win, text=category, color=(1, -0.7, -0.7), pos=(0.0, -1.0),
-                            colorSpace='rgb', bold=True, height=4.5, anchorHoriz="center", font='Helvetica', wrapWidth=400)
-
-    text.draw()
-    text2.draw()
-
-    win.flip()
-
-    time.sleep(4)
-
-    win.close()

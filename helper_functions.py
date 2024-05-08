@@ -3,7 +3,13 @@ from rdp import rdp
 from global_static_vars import lower_edge_canvas, width_side
 from global_static_vars import max_rescale, drawing_area_x, drawing_area_y, center_y, center_x
 from shapely.geometry import LineString, Point
+from nicocameras import NicoCameras
+import cv2 as cv
+import time
 
+cameras_running = True
+
+cameras = NicoCameras()
 ### Coordinate manipulations ###    
 def flatten_data(data: list[list[list[int]]]):
     flattened_strokes = []
@@ -93,3 +99,16 @@ def calculate_error(strokes_should : list[list[list[int]]], strokes_act):
     distances = numpy.divide(distance_sums, amount_of_points, where=amount_of_points!=0)
     print(f"Distances: {distances}")
     return distances.sum()/len(distances)
+
+# TODO: Test if it works
+def display_camera_image():
+    while cameras_running:
+        left_frame, right_frame = cameras.read()
+        cv.imshow(left_frame, right_frame)
+        cv.waitKey(10)
+
+def close_cameras():
+    global cameras_running
+    cameras_running = False
+    time.sleep(1)
+    cameras.close()

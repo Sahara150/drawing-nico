@@ -50,6 +50,10 @@ line_args = {
     'path_folder_participant': "empty"
 }
 
+# The first category is a trial for the user to get used to it. We do record it, but just ignore it in the statistics
+# since it's easier to actively ignore it.
+category_trial = ["apple"]
+category_trial_sk = ["jablko"]
 categories_no_imitation = ["leaf", "spider", "pizza", "palm tree", "sheep"]
 categories_sk_no_imitation = ["list", "pavúk", "pizza", "palma", "ovca"]
 categories_fixed_imitation = ["square", "triangle"]

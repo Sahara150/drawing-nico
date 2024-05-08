@@ -6,12 +6,12 @@ import threading
 import numpy as np
 from global_static_vars import images_dir, experiment_dir, line_args
 from global_static_vars import categories_no_imitation, categories_sk_no_imitation, categories_fixed_imitation, categories_fixed_imitation_sk
-from global_static_vars import categories_imitation_mixed, categories_sk_imitation_mixed, category_imitation_last, category_sk_imitation_last
-from helper_functions import flatten_data, transform_coordinates, rescale_and_shift_image, calculate_error
-from file_helper import read_newest_results, append_to_ndjson
+from global_static_vars import categories_imitation_mixed, categories_sk_imitation_mixed, category_imitation_last, category_sk_imitation_last, category_trial, category_trial_sk
+from helper_functions import flatten_data, transform_coordinates, rescale_and_shift_image, calculate_error, display_camera_image, close_cameras
+from file_helper import read_newest_results, append_to_ndjson, read_results
 from canvas_functions import create_canvas_with_data_from_strokes, create_canvas_with_flattened_data, open_canvas_for_robot, strokes
-from canvas_functions import ask_question, configure_and_show, show_category_prompt
-from robot_setup import load_robot, look_down, robot_draws_strokes, look_to_side
+from canvas_functions import ask_question, configure_and_show, show_category_prompt, show_prompt
+from robot_setup import load_robot, look_down, robot_draws_strokes, look_to_side, to_default_position
 from texts import tr, rating_scale_text
 import random
 import sys
@@ -34,12 +34,14 @@ def setup_for_participant():
 
     line_args['path_folder_participant'] = path_folder_participant
 
-def user_draws():
-    for i in range(0,1):
-        open_canvas(f"tulip", line_args['path_folder_participant'], "robot")
+def user_draws(category : str):
+    open_canvas(category, line_args['path_folder_participant'], "robot")
 
 def draw_without_imitation():
     configure_and_show()
+    show_prompt(tr("Before starting with the experiment, you will go through the process of drawing and asnwering once to get used to it. When you are ready, click the button.", "Pred začatím experimentu si raz prejdete procesom kreslenia a písania, aby ste si naň zvykli. Keď ste pripravení, kliknite na tlačidlo."))
+    drawing_activity(category_trial, category_trial if line_args['country']!="sk" else category_trial_sk, False)
+    show_prompt(tr("Are you ready to start with the actual experiment? Then press the button.", "Ste pripravení začať so samotným experimentom? Potom stlačte tlačidlo."))
     seq = [0, 1, 2, 3, 4]  # 0 is leaf, 1 is spider, 2 is pizza
     ratings = np.zeros(5)
     random.shuffle(seq)
@@ -97,7 +99,7 @@ def drawing_activity(category : str, category_text: str, robot_active : bool = F
         open_canvas(category, line_args['path_folder_participant'], "second" if i == 2 else "first")
 
         if robot_active:
-            data = read_newest_results(category)
+            data = read_newest_results(category, i)
             flattened_data = flatten_data(data)
             # Setting true for now, as we will use the learned model with Perceptrons
             mirrored_data = transform_coordinates(flattened_data, True)
@@ -108,8 +110,13 @@ def drawing_activity(category : str, category_text: str, robot_active : bool = F
             open_canvas_for_robot(rescaled_data, category)
             
             error = calculate_error(rescaled_data, strokes)
+            # Reformatting strokes so that it is readable json for panda later
+            strokes = strokes[:2] + [strokes[2]]
+            timestamp = str(datetime.fromtimestamp(time.time()))
+
             drawing_data = {
                 'participant': line_args['participant'],
+                'timestamp': timestamp,
                 'trial': i,
                 'rescale_factor': rescale_factor,
                 'shift_x': shift_x,
@@ -144,6 +151,11 @@ condition = "repeat" # sys.argv[3]
 setup_for_participant()
 robot = load_robot()
 
+time.sleep(3)
+
+to_default_position(robot)
+camera_thread = threading.thread(display_camera_image)
+camera_thread.start()
 
 if condition == 'repeat':
     draw_with_imitation()
@@ -154,7 +166,8 @@ else:
 # Sleep 3 seconds til robot got woken up
 #time.sleep(3)
 #look_down(robot)
-#user_draws()
+#user_draws("tulip")
+#data = read_results("square_robot", 0)
 #data = read_newest_results("tulip")
 #data = read_newest_results("robot_result_fixed")
 #flattened_data = flatten_data(data)
@@ -170,4 +183,7 @@ else:
 #print("Calculating error now")
 #error = calculate_error(rescaled_data, strokes)
 #print(f"Error is: {error}")
+close_cameras()
+time.sleep(1)
+print("Click")
 sys.exit()
