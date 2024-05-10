@@ -1,6 +1,6 @@
 import sys
 
-code_path = "C:/Users/haras/Uni_SourceCodes/NICO/drawing-nico/"   #for Bratislava
+code_path = "C:/Experiment/Teachingnicdraw/"   #for Bratislava
 
 images_dir = code_path +"Images/"
 experiment_dir = images_dir + "Experiments_raw/"
@@ -52,8 +52,8 @@ line_args = {
 
 # The first category is a trial for the user to get used to it. We do record it, but just ignore it in the statistics
 # since it's easier to actively ignore it.
-category_trial = ["apple"]
-category_trial_sk = ["jablko"]
+category_trial = "apple"
+category_trial_sk = "jablko"
 categories_no_imitation = ["leaf", "spider", "pizza", "palm tree", "sheep"]
 categories_sk_no_imitation = ["list", "pavúk", "pizza", "palma", "ovca"]
 categories_fixed_imitation = ["square", "triangle"]

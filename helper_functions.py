@@ -82,25 +82,25 @@ def calculate_error(strokes_should : list[list[list[int]]], strokes_act):
     distance_sums = numpy.zeros(len(strokes_should))
     amount_of_points = numpy.zeros(len(strokes_should))    
     for stroke in strokes_act:
-        if len(stroke[0])!=0:
+        if len(stroke[0])>1:
             # Stroke at index 2 contains stroke count
             stroke_should = strokes_should[stroke[2][0]]
-            line = LineString(stroke_should)
-            distance_sum = 0
-            for index, x in enumerate(stroke[0]):
-                p = Point(x, stroke[1][index])
-                distance = p.distance(line)
-                distance_sum += abs(distance)
+            if len(stroke_should) > 1:
+                line = LineString(stroke_should)
+                distance_sum = 0
+                for index, x in enumerate(stroke[0]):
+                    p = Point(x, stroke[1][index])
+                    distance = p.distance(line)
+                    distance_sum += abs(distance)
 
-            distance_sums[stroke[2]] += distance_sum
-            amount_of_points[stroke[2]] += len(stroke[0])
+                distance_sums[stroke[2]] += distance_sum
+                amount_of_points[stroke[2]] += len(stroke[0])
 
     print(f"Distance sums: {distance_sums}, Amount of points: {amount_of_points}")
     distances = numpy.divide(distance_sums, amount_of_points, where=amount_of_points!=0)
     print(f"Distances: {distances}")
     return distances.sum()/len(distances)
 
-# TODO: Test if it works
 def display_camera_image():
     print("Displaying camera image")
     while cameras_running:
