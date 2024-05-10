@@ -94,8 +94,14 @@ def drawing_activity(category : str, category_text: str, robot_active : bool = F
     repetitions = 2 if robot_active else 1
     ratings = []
     for i in range(0,repetitions):
-        show_category_prompt(category_text, second_time = True if i == 1 else False)
+        if i == 1:
+            textShown = tr(f"Are you ready to draw {category} for the robot a second time?", f"Ste pripravení nakresliť {category} pre robota druhýkrát?")
+        else: 
+            textShown = tr("Are you ready to draw?","Ste pripravení začať kresliť?")
+        show_prompt(textShown)
+        time.sleep(1)
         look_down(robot)
+        show_category_prompt(category_text)
         open_canvas(category, line_args['path_folder_participant'], "second" if i == 2 else "first")
 
         if robot_active:
@@ -110,8 +116,6 @@ def drawing_activity(category : str, category_text: str, robot_active : bool = F
             open_canvas_for_robot(rescaled_data, category)
             
             error = calculate_error(rescaled_data, strokes)
-            # Reformatting strokes so that it is readable json for panda later
-            strokes = strokes[:2] + [strokes[2]]
             timestamp = str(datetime.fromtimestamp(time.time()))
 
             drawing_data = {
@@ -144,9 +148,9 @@ def ask_questions(category : str, category_en : str, robot_imitated : bool = Fal
     else:
         return [rating_self, None]
 
-line_args['participant'] = "test" #sys.argv[1]
-line_args['country'] = "en" # sys.argv[2]
-condition = "repeat" # sys.argv[3]
+line_args['participant'] = sys.argv[1] #"test" 
+line_args['country'] = sys.argv[2] #"en" # 
+condition =  sys.argv[3] #"repeat"
 
 setup_for_participant()
 robot = load_robot()
@@ -154,8 +158,11 @@ robot = load_robot()
 time.sleep(3)
 
 to_default_position(robot)
-camera_thread = threading.thread(display_camera_image)
+camera_thread = threading.Thread(target = display_camera_image)
 camera_thread.start()
+
+print("Press enter to continue")
+input()
 
 if condition == 'repeat':
     draw_with_imitation()
@@ -168,7 +175,7 @@ else:
 #look_down(robot)
 #user_draws("tulip")
 #data = read_results("square_robot", 0)
-#data = read_newest_results("tulip")
+#data = read_newest_results("tulip", 0)
 #data = read_newest_results("robot_result_fixed")
 #flattened_data = flatten_data(data)
 #create_canvas_with_data_from_strokes(data)

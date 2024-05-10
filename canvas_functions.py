@@ -61,7 +61,7 @@ def on_mouse_release(event):
     # still knows which stroke it belongs to
     # Just setting last coordinate to none, so that new stroke begins
     print("Mouse release")
-    strokes.append([x, y, stroke_count])
+    strokes.append([x, y, [stroke_count]])
     print(f"Strokes length is {len(strokes)}")
     x = []
     y = []
@@ -99,7 +99,7 @@ def open_canvas_for_robot(data : list[list[list[int]]], _category : str):
     reset_variables()
 
     (root, canvas) = setup_UI()
-    draw_template(data, canvas)
+    #draw_template(data, canvas)
     
     canvas.bind('<ButtonPress-1>', on_mouse_down)
 
@@ -211,15 +211,8 @@ def ask_question(question : str, image_path : str):
             touch = True
             return rating
         
-def show_category_prompt(category : str, second_time : bool = False):
-
-    time.sleep(1.5)
-    if second_time:
-        textShown = tr(f"Are you ready to draw {category} for the robot a second time?", f"Ste pripravení nakresliť {category} pre robota druhýkrát?")
-    else: 
-        textShown = tr("Are you ready to draw?","Ste pripravení začať kresliť?")
-    show_prompt(textShown)
-
+def show_category_prompt(category : str):
+    
     text = visual.TextStim(win, text=tr("Please draw with your finger the...\n","Prosím, prstom nakreslite...\n"), color=(1, 1, 1), pos=(0.0, 11.0),
                            colorSpace='rgb', bold=False, height=2.5, anchorHoriz="center", font='Helvetica', wrapWidth=400)
 

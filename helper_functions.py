@@ -84,7 +84,7 @@ def calculate_error(strokes_should : list[list[list[int]]], strokes_act):
     for stroke in strokes_act:
         if len(stroke[0])!=0:
             # Stroke at index 2 contains stroke count
-            stroke_should = strokes_should[stroke[2]]
+            stroke_should = strokes_should[stroke[2][0]]
             line = LineString(stroke_should)
             distance_sum = 0
             for index, x in enumerate(stroke[0]):
@@ -102,9 +102,12 @@ def calculate_error(strokes_should : list[list[list[int]]], strokes_act):
 
 # TODO: Test if it works
 def display_camera_image():
+    print("Displaying camera image")
     while cameras_running:
         left_frame, right_frame = cameras.read()
-        cv.imshow(left_frame, right_frame)
+        result = cv.hconcat([left_frame,right_frame])
+        
+        cv.imshow("Nicos eyes", result)
         cv.waitKey(10)
 
 def close_cameras():

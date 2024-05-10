@@ -19,15 +19,16 @@ def load_robot() -> Motion :
     return robot
 
 def to_default_position(robot : Motion):
-    move_to_position_through_time_ext(rightArmDofs, parking_position, 1.5)
-    move_to_position_through_time_ext(leftArmDofs, parking_position, 1.5)
+    move_to_position_through_time_ext(rightArmDofs, parking_position[:-1], 1.5)
+    move_to_position_through_time_ext(leftArmDofs, parking_position[:-1], 1.5)
 
 def look_down(robot : Motion):
     robot.setAngle("head_y", -40.0, default_speed)
     robot.setAngle("head_z", 0.0, default_speed)
 
 def look_to_side(robot : Motion):
-    pass
+    robot.setAngle("head_y", 0.0, default_speed)
+    robot.setAngle("head_z", 62, default_speed)
 
 def setup_robot(robot : Motion):
     robot.enableTorqueAll()
@@ -191,7 +192,8 @@ def get_output_for_point(point : list[int], left : bool = False):
         # 0.0039 is equivalent of 0.7/180
         print("Hit")
         # TODO: Test influence
-        result[3] -= 0.0039
+        result[5] -= 0.0056
+        result[3] += 0.0044
     return result    
 
 

@@ -69,5 +69,5 @@ viewdist = 25.4
 monitorname = 'testMonitor'
 scrn = 1
 
-min_duration = 0.01
+min_duration = 0.001
 duration_down = 0.2
