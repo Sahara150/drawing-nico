@@ -8,7 +8,7 @@ import cv2
 class NicoCameras:
 
     def __init__(self):
-        self.ids = [0,1]
+        self.ids = [0,3]
         self.frames = {}
         self.fpss = {}
         for id in self.ids:

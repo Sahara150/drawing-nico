@@ -39,7 +39,7 @@ def user_draws(category : str):
 
 def draw_without_imitation():
     configure_and_show()
-    show_prompt(tr("Before starting with the experiment, you will go through the process of drawing and asnwering once to get used to it. When you are ready, click the button.", "Pred začatím experimentu si raz prejdete procesom kreslenia a písania, aby ste si naň zvykli. Keď ste pripravení, kliknite na tlačidlo."))
+    show_prompt(tr("Before starting with the experiment, \n you will go through the process of drawing and answering once to get used to it. \n When you are ready, click the button.", "Pred začatím experimentu si raz prejdete procesom kreslenia a písania, \n aby ste si naň zvykli. \n Keď ste pripravení, kliknite na tlačidlo."))
     drawing_activity(category_trial, category_trial if line_args['country']!="sk" else category_trial_sk, False)
     show_prompt(tr("Are you ready to start with the actual experiment? Then press the button.", "Ste pripravení začať so samotným experimentom? Potom stlačte tlačidlo."))
     seq = [0, 1, 2, 3, 4]  # 0 is leaf, 1 is spider, 2 is pizza
