@@ -1,7 +1,7 @@
 from nicomotion.Motion import Motion
 from global_static_vars import default_speed, width_side, height_side
 from global_static_vars import  ready_position, steady_position, parking_position, leftArmDofs, rightArmDofs, parking_time
-from global_static_vars import x_upper, x_lower, y_lower, y_upper, min_duration, duration_down
+from global_static_vars import x_upper, x_lower, y_lower, y_upper, min_duration, duration_down, duration_const
 from keras.models import load_model
 import keras
 import numpy as np
@@ -76,7 +76,7 @@ def robot_draws_strokes(strokes: list[list[list[int]]]):
                 touch_timestamp = duration_movement(rescaled_angles_right[0], last_pos)
                 move_to_position_through_time_ext(rightArmDofs, [(angle if index != 5 else -180.0) for index, angle in enumerate(rescaled_angles_right[0])], round(touch_timestamp))  
                 time.sleep(touch_timestamp)
-                time.sleep(1)
+                time.sleep(0.1)
             
             play_movement(rightArmDofs, poses_right, durations_right)
             play_movement(leftArmDofs, poses_left, durations_left)
@@ -126,7 +126,7 @@ def get_poses_and_durations_right(rescaled_angles_right : list[list[float]]):
         # what would be better time calculation
         durations_right += [ duration_movement(angles, rescaled_angles_right[index-1]) for index, angles in enumerate(rescaled_angles_right[1:])]
         durations_right += [
-            0.75,
+            0.5,
             0.25
         ]
 
@@ -212,4 +212,4 @@ def limit_index_finger(output: list[float]):
     return output
 
 def duration_movement(angles_curr : list[float], angles_old : list[float]):
-    return max(abs(angles_curr[0] - angles_old[0])*0.1 + abs(angles_curr[1] - angles_old[1]) * 0.1, min_duration)
+    return max(abs(angles_curr[0] - angles_old[0])*duration_const + abs(angles_curr[1] - angles_old[1]) * duration_const, min_duration)
