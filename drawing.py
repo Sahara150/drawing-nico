@@ -185,8 +185,7 @@ def quit_program():
     time.sleep(0.5)
 
 
-    ImageGrab.grab().crop((65, 65, width_side, lower_edge_canvas)).save(participant + "/" + category + ".png")
-
+    ImageGrab.grab().crop((65, 65, width_side, lower_edge_canvas)).save(participant + "/" + category + "_" + condition + ".png")
     if temp > 0:
         temp2 = time.time() - margin
         total_drawing_time = temp + temp2

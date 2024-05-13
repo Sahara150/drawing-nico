@@ -90,10 +90,11 @@ def on_mouse_move(event):
     prev_x = c_x
     prev_y = c_y
 
-def open_canvas_for_robot(data : list[list[list[int]]], _category : str):
-    global canvas, root, category
+def open_canvas_for_robot(data : list[list[list[int]]], _category : str, _trial : int):
+    global canvas, root, category, trial
 
     category = _category
+    trial = _trial
     #Reset variables so it deletes data of last drawing
     print("Reset variables")
     reset_variables()
@@ -118,7 +119,7 @@ def open_canvas_for_robot(data : list[list[list[int]]], _category : str):
     root.mainloop()
 
 def close_canvas():
-    ImageGrab.grab().crop((0, 0, width_side, height_side)).rotate(180.0).save(line_args['path_folder_participant'] + "/" + category + "_drawing_robot.png")
+    ImageGrab.grab().crop((0, 0, width_side, height_side)).rotate(180.0).save(line_args['path_folder_participant'] + "/" + category + "_" + trial + "_drawing_robot.png")
 
     root.event_generate("<<close_canvas>>", when="tail", state=123) # trigger event in main thread
 

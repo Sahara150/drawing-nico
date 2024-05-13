@@ -105,7 +105,7 @@ def drawing_activity(category : str, category_text: str, robot_active : bool = F
         time.sleep(1)
         look_down(robot)
         show_category_prompt(category_text)
-        open_canvas(category, line_args['path_folder_participant'], "second" if i == 2 else "first")
+        open_canvas(category, line_args['path_folder_participant'], "second" if i == 1 else "first")
 
         if robot_active:
             data = read_newest_results(category, i)
@@ -116,7 +116,7 @@ def drawing_activity(category : str, category_text: str, robot_active : bool = F
             rescaled_data = list(rescaled_data)
             drawing_robot_thread = threading.Thread(target = robot_draws_strokes, args = (rescaled_data,))
             drawing_robot_thread.start()
-            open_canvas_for_robot(rescaled_data, category)
+            open_canvas_for_robot(rescaled_data, category, i)
             
             error = calculate_error(rescaled_data, strokes)
             timestamp = str(datetime.fromtimestamp(time.time()))
