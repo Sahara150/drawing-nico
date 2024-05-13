@@ -70,10 +70,10 @@ def robot_draws_strokes(strokes: list[list[list[int]]]):
             (poses_left, durations_left) = get_poses_and_durations_left(rescaled_angles_left, poses_right, durations_right)
             
             if len(rescaled_angles_right)!=0:
-                touch_timestamp = 450 + rescaled_angles_right[0][0]*250
+                touch_timestamp = 250 + rescaled_angles_right[0][0]*75
                 move_to_position_through_time_ext(rightArmDofs, [(angle if index != 5 else -180.0) for index, angle in enumerate(rescaled_angles_right[0])], round(touch_timestamp)/1000.0)  
                 time.sleep(touch_timestamp/1000.0)
-                time.sleep(1)
+                time.sleep(0.1)
             
             play_movement(rightArmDofs, poses_right, durations_right)
             play_movement(leftArmDofs, poses_left, durations_left)    
@@ -122,7 +122,7 @@ def get_poses_and_durations_right(rescaled_angles_right : list[list[float]]):
         # what would be better time calculation
         durations_right += [ duration_movement(angles, rescaled_angles_right[index-1]) for index, angles in enumerate(rescaled_angles_right[1:])]
         durations_right += [
-            0.75,
+            0.5,
             0.25
         ]
 

@@ -7,8 +7,8 @@ from global_static_vars import experiment_dir, category_imitation_last
 
 ### File helpers ###
 def read_newest_results(category : str, trial : int):
-    #if category == category_imitation_last and trial == 0:
-    if category == category_imitation_last:
+    if category == category_imitation_last and trial == 0:
+    #if category == category_imitation_last:
         path_results = "./preset_flower.ndjson"
     else:    
         path_results = experiment_dir + f"raw_{category}.ndjson"

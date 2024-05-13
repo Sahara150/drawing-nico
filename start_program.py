@@ -143,7 +143,7 @@ def ask_questions(category : str, category_en : str, trial : int, robot_imitated
     image_path_self = line_args['path_folder_participant'] + "/" + category_en + ("_second" if trial == 1 else "_first") + ".png"
     rating_self = ask_question(text_self, image_path_self)
     if robot_imitated:
-        text_robot = tr("How much do you like the robots drawing of the ", "Ako veľmi sa vám páči kresba robotov s: " + category + "? \n")
+        text_robot = tr("How much do you like the robots drawing of the " + category + "? \n", "Ako veľmi sa vám páči kresba robotov s: " + category + "? \n")
         text_robot += rating_scale_text()
         image_path_robot = line_args['path_folder_participant'] + "/" + category + f"_{trial}_drawing_robot.png"
         rating_robot = ask_question(text_robot, image_path_robot)
@@ -151,9 +151,9 @@ def ask_questions(category : str, category_en : str, trial : int, robot_imitated
     else:
         return [rating_self, None]
 
-line_args['participant'] =  "test" # sys.argv[1] #
-line_args['country'] =  "en" # sys.argv[2] #
-condition =  "repeat" #sys.argv[3] # 
+line_args['participant'] =  sys.argv[1] #"test" # 
+line_args['country'] =  sys.argv[2] #"en" # 
+condition =  sys.argv[3] # "repeat" #
 
 setup_for_participant()
 robot = load_robot()
