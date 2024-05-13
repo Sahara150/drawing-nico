@@ -67,24 +67,27 @@ def draw_with_imitation():
     for index, category in enumerate(categories_fixed_imitation):
         category_text = categories_fixed_imitation_sk[index] if line_args['country'] == "sk" else category
         rating = drawing_activity(category, category_text, True)
+        print(f"Rating for {category} was {rating}")
         ratings[index] = rating
-    seq = [0, 1, 2, 3]    
+    seq = [0, 1, 2, 3]
     random.shuffle(seq)
     for index in seq:
         category = categories_imitation_mixed[index]
         category_text = categories_sk_imitation_mixed[index] if line_args['country'] == "sk" else category
         rating = drawing_activity(category, category_text, True)
+        print(f"Rating for {category} was {rating}")
         ratings[index+2] = rating
 
     category_text = category_sk_imitation_last if line_args['country']  == "sk" else category_imitation_last   
     rating = drawing_activity(category_imitation_last, category_text, True)
+    print(f"Rating for {category_imitation_last} was {rating}")
     ratings[-1] = rating
     drawing_data = {
         'condition' : 'repeat',
-        'ratings_self_1' : list(ratings[:][0][0]),
-        'ratings_robot_1' : list(ratings[:][0][1]),
-        'ratings_self_2': list(ratings[:][1][0]),
-        'ratings_robot_2' : list(ratings[:][1][1]),
+        'ratings_self_1' : list(rating[0][0] for rating in ratings),
+        'ratings_robot_1' : list(rating[0][1] for rating in ratings),
+        'ratings_self_2': list(rating[1][0] for rating in ratings),
+        'ratings_robot_2' : list(rating[1][1] for rating in ratings),
         'order' : seq
     }
     strokes_file_path = line_args['path_folder_participant'] + "/ratings_repeat.ndjson"
@@ -148,9 +151,9 @@ def ask_questions(category : str, category_en : str, robot_imitated : bool = Fal
     else:
         return [rating_self, None]
 
-line_args['participant'] = sys.argv[1] #"test" 
-line_args['country'] = sys.argv[2] #"en" # 
-condition =  sys.argv[3] #"repeat"
+line_args['participant'] = sys.argv[1] # "test" # 
+line_args['country'] = sys.argv[2] # "en" # 
+condition =  sys.argv[3] # "repeat" #
 
 setup_for_participant()
 robot = load_robot()
