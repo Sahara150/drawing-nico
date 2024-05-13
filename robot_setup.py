@@ -1,7 +1,7 @@
 from nicomotion.Motion import Motion
 from global_static_vars import default_speed, width_side, height_side
 from global_static_vars import  ready_position, steady_position, parking_position, leftArmDofs, rightArmDofs, parking_time
-from global_static_vars import x_upper, x_lower, y_lower, y_upper, min_duration, duration_down
+from global_static_vars import x_upper, x_lower, y_lower, y_upper, min_duration, duration_down, duration_const
 from keras.models import load_model
 import keras
 import numpy as np
@@ -208,4 +208,4 @@ def limit_index_finger(output: list[float]):
     return output
 
 def duration_movement(angles_curr : list[float], angles_old : list[float]):
-    return max(abs(angles_curr[0] - angles_old[0])*0.1 + abs(angles_curr[1] - angles_old[1]) * 0.1, min_duration)
+    return max(abs(angles_curr[0] - angles_old[0])*duration_const + abs(angles_curr[1] - angles_old[1]) * duration_const, min_duration)

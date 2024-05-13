@@ -71,3 +71,4 @@ scrn = 1
 
 min_duration = 0.001
 duration_down = 0.2
+duration_const = 0.05

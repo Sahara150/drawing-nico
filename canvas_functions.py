@@ -119,7 +119,7 @@ def open_canvas_for_robot(data : list[list[list[int]]], _category : str, _trial 
     root.mainloop()
 
 def close_canvas():
-    ImageGrab.grab().crop((0, 0, width_side, height_side)).rotate(180.0).save(line_args['path_folder_participant'] + "/" + category + "_" + trial + "_drawing_robot.png")
+    ImageGrab.grab().crop((0, 0, width_side, height_side)).rotate(180.0).save(line_args['path_folder_participant'] + "/" + f"{category}_{trial}_drawing_robot.png")
 
     root.event_generate("<<close_canvas>>", when="tail", state=123) # trigger event in main thread
 
