@@ -53,6 +53,9 @@ def robot_draws_strokes(strokes: list[list[list[int]]]):
 
     play_movement(rightArmDofs, poses_right_arm, durations_right_arm)       
     
+    # This is a variable to calculate the duration for the first move from next stroke (over)
+    # based on distance to last position
+    last_pos = steady_position[:-1]
     # We get each point, get the angles for it and then implement the 
     # continuous movement
     for index, stroke in enumerate(strokes):
@@ -70,13 +73,14 @@ def robot_draws_strokes(strokes: list[list[list[int]]]):
             (poses_left, durations_left) = get_poses_and_durations_left(rescaled_angles_left, poses_right, durations_right)
             
             if len(rescaled_angles_right)!=0:
-                touch_timestamp = 450 + rescaled_angles_right[0][0]*250
-                move_to_position_through_time_ext(rightArmDofs, [(angle if index != 5 else -180.0) for index, angle in enumerate(rescaled_angles_right[0])], round(touch_timestamp)/1000.0)  
-                time.sleep(touch_timestamp/1000.0)
+                touch_timestamp = duration_movement(rescaled_angles_right[0], last_pos)
+                move_to_position_through_time_ext(rightArmDofs, [(angle if index != 5 else -180.0) for index, angle in enumerate(rescaled_angles_right[0])], round(touch_timestamp))  
+                time.sleep(touch_timestamp)
                 time.sleep(1)
             
             play_movement(rightArmDofs, poses_right, durations_right)
-            play_movement(leftArmDofs, poses_left, durations_left)    
+            play_movement(leftArmDofs, poses_left, durations_left)
+            last_pos = poses_right[-1]    
             increase_stroke_count()
         # At end of drawing, move left arm back to parking and right arm through steady & ready
     # back to parking
