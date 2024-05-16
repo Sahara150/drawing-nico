@@ -151,9 +151,9 @@ def ask_questions(category : str, category_en : str, trial : int, robot_imitated
     else:
         return [rating_self, None]
 
-line_args['participant'] =  sys.argv[1] #"test" # 
+line_args['participant'] =  sys.argv[1] # "test" # 
 line_args['country'] =  sys.argv[2] #"en" # 
-condition =  sys.argv[3] # "repeat" #
+condition =   sys.argv[3] #"repeat" # 
 
 setup_for_participant()
 robot = load_robot()
@@ -176,9 +176,9 @@ else:
 # Sleep 3 seconds til robot got woken up
 #time.sleep(3)
 #look_down(robot)
-#user_draws("tulip")
-#data = read_results("square_robot", 0)
-#data = read_newest_results("tulip", 0)
+#user_draws("bee")
+#data = read_results("bee", 6)
+#data = read_newest_results("face", 0)
 #data = read_newest_results("robot_result_fixed")
 #flattened_data = flatten_data(data)
 #create_canvas_with_data_from_strokes(data)
@@ -189,7 +189,7 @@ else:
 #rescaled_data = list(rescaled_data)
 #drawing_robot_thread = threading.Thread(target = robot_draws_strokes, args = (rescaled_data, ))
 #drawing_robot_thread.start()
-#open_canvas_for_robot(rescaled_data, "tulip")
+#open_canvas_for_robot(rescaled_data, "bee", 0)
 #print("Calculating error now")
 #error = calculate_error(rescaled_data, strokes)
 #print(f"Error is: {error}")

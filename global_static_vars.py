@@ -38,8 +38,8 @@ leftArmDofs = ['l_shoulder_z','l_shoulder_y','l_arm_x','l_elbow_y','l_wrist_z','
 
 # Last column is time stamp
 parking_position = [-8.0, -15.0, 16.0, 74.0, -24.0, 35.0, -71.0, -104.0, -180.0, -180.0, 0]
-ready_position = [-8.0, 46.0, 13.0, 99.0, 44.0, 99.0, -70.0, 32.0, -180.0, 180.0, 510]
-steady_position = [13.0, 36.0, 25.0, 106.0, 66.0, -180.0, -70.0, 26.0, -180.0, 172.0, 800]
+ready_position = [-8.0, 46.0, 13.0, 99.0, 44.0, 99.0, -70.0, 32.0, -180.0, 180.0, 800]
+steady_position = [13.0, 36.0, 25.0, 106.0, 66.0, -180.0, -70.0, 26.0, -180.0, 172.0, 1100]
 
 parking_time = 1.500
 ### These variables are set as arguments when executing in command line, 
@@ -69,6 +69,6 @@ viewdist = 25.4
 monitorname = 'testMonitor'
 scrn = 1
 
-min_duration = 0.001
-duration_down = 0.25
-duration_const = 0.05
+min_duration = 0.05
+duration_down = 0.4
+duration_const = 0.08

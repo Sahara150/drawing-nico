@@ -47,6 +47,7 @@ def open_canvas(_category : str, _participant : str, _condition : str):
     # Bind the mouse release event to the canvas
     canvas.bind('<ButtonRelease-1>', on_mouse_release)
 
+    canvas.bind('<ButtonPress-1>', on_mouse_down)
 
     # Start the main Tkinter event loop
     root.mainloop()
@@ -136,6 +137,10 @@ def on_mouse_release(event):
     
     stroke_count += 1
 
+def on_mouse_down(event):
+    global prev_x, prev_y
+    prev_x = event.x
+    prev_y = event.y
 
 
 def alert_window():

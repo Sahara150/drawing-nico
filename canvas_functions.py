@@ -104,6 +104,8 @@ def open_canvas_for_robot(data : list[list[list[int]]], _category : str, _trial 
     
     canvas.bind('<ButtonPress-1>', on_mouse_down)
 
+    canvas.bind("<ButtonPress-3>", on_mouse_down)
+
     # Bind the mouse movement event to the canvas
     canvas.bind('<B1-Motion>', on_mouse_move)
     
